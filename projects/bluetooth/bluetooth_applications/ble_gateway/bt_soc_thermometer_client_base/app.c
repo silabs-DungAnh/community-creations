@@ -67,7 +67,7 @@
 // Macro to translate the Flags to Celsius (C) or Fahrenheit (F). Flags is the first byte of the
 // Temperature Measurement characteristic value according to the Bluetooth SIG
 #define translate_flags_to_temperature_unit(flags) (((flags) & 1) ? UNIT_FAHRENHEIT : UNIT_CELSIUS)
-
+//test
 typedef enum {
   scanning,
   opening,
