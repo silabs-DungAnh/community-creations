@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file
- * @brief Application Properties Header File
+ * @brief Application Over-the-Air Device Firmware Update
  *******************************************************************************
  * # License
- * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -27,39 +27,25 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+#ifndef SLI_BT_APP_OTA_DFU_H
+#define SLI_BT_APP_OTA_DFU_H
 
-#ifndef APP_PROPERTIES_CONFIG_H
-#define APP_PROPERTIES_CONFIG_H
+#include "sl_bt_api.h"
 
-#include "sl_application_type.h"
+/**************************************************************************//**
+ * Application OTA DFU initialization.
+ *****************************************************************************/
+void sli_bt_app_ota_dfu_init(void);
 
-// <<< Use Configuration Wizard in Context Menu >>>
+/**************************************************************************//**
+ * Finalize initialization. (App RTA calls that requires scheduler.)
+ *****************************************************************************/
+void sli_bt_app_ota_dfu_rta_ready(void);
 
-// <h>App Properties settings
+/**************************************************************************//**
+ * Bluetooth stack event handler.
+ * @param[in] evt Event coming from the Bluetooth stack.
+ *****************************************************************************/
+void sli_bt_app_ota_dfu_on_event(sl_bt_msg_t *evt);
 
-// Type of signature this application is signed with
-// Default: APPLICATION_SIGNATURE_NONE(0)
-#define SL_APPLICATION_SIGNATURE               0
-
-// Location of the signature
-// Default: 0xFFFFFFFF
-#define SL_APPLICATION_SIGNATURE_LOCATION      0xFFFFFFFF
-
-// Bitfield representing type of application
-#define SL_APPLICATION_TYPE                    APPLICATION_TYPE
-
-// <o SL_APPLICATION_VERSION> Version number for this application
-// <0-4294967295:1>
-// <i> Default: 1 [0-4294967295]
-#define SL_APPLICATION_VERSION                 1
-
-// Capabilities of this application
-// Default: 0
-#define SL_APPLICATION_CAPABILITIES            0
-
-//Product ID of the device for which the application is built
-#define SL_APPLICATION_PRODUCT_ID             { 0 }
-
-// </h>
-
-#endif // APP_PROPERTIES_CONFIG_H
+#endif // SLI_BT_APP_OTA_DFU_H

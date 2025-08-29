@@ -10,7 +10,7 @@ referenced in this SBOM.)
 -->
 <bom xmlns="http://cyclonedx.org/schema/bom/1.6" version="1">
   <metadata>
-    <timestamp>2025-08-29T04:08:36.118691200Z</timestamp>
+    <timestamp>2025-08-29T06:56:03.175456900Z</timestamp>
     <authors>
       <author>
         <name>Silicon Laboratories, Inc.</name>
@@ -217,16 +217,6 @@ referenced in this SBOM.)
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:i2cspm" type="library">
           <name>I2CSPM</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:in_place_ota_dfu" type="library">
-          <name>In-Place OTA DFU</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -1415,16 +1405,6 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_app_properties" type="library">
-          <name>App Properties</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib</expression>
-          </licenses>
-        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:emlib_msc" type="library">
           <name>MSC</name>
           <version>2025.6.1</version>
@@ -1433,16 +1413,6 @@ referenced in this SBOM.)
 	      </supplier>
           <licenses>
             <expression>Zlib</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_interface_s2" type="library">
-          <name>Bootloader Application Interface Series 2</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
           </licenses>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:device_i2c" type="library">
@@ -1517,16 +1487,6 @@ referenced in this SBOM.)
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:rail_util_features" type="library">
           <name>RAIL Library Features, Core</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:apploader" type="library">
-          <name>AppLoader Support for Applications</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -1883,16 +1843,6 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_interface" type="library">
-          <name>Bootloader Application Interface</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
-          </licenses>
-        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:mbedtls_platform_dynamic_memory_allocation_config_default" type="library">
           <name>Default dynamic memory allocation macros for mbedtls</name>
           <version>2025.6.1</version>
@@ -2031,16 +1981,6 @@ referenced in this SBOM.)
             </ancestors>
           </pedigree>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:apploader_util" type="library">
-          <name>AppLoader Utility</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
-          </licenses>
-        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:sl_common" type="library">
           <name>Common Functions</name>
           <version>2025.6.1</version>
@@ -2102,6 +2042,66 @@ referenced in this SBOM.)
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:gpio" type="library">
           <name>GPIO Driver</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:app_ota_dfu" type="library">
+          <name>Application OTA DFU</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_app_properties" type="library">
+          <name>App Properties</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_interface_s2" type="library">
+          <name>Bootloader Application Interface Series 2</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:app_queue" type="library">
+          <name>Application Queue</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_interface" type="library">
+          <name>Bootloader Application Interface</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:app_rta" type="library">
+          <name>Application Runtime Adaptor (RTA)</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>

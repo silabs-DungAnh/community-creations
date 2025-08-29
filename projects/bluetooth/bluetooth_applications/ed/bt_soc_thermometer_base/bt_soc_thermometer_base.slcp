@@ -31,6 +31,7 @@ component:
 - {id: app_assert}
 - {id: app_log}
 - {id: app_os_helper}
+- {id: app_ota_dfu}
 - {id: app_timer}
 - {id: bluetooth_feature_connection_role_peripheral}
 - {id: bluetooth_feature_gatt_server}
@@ -50,7 +51,6 @@ component:
 - {id: health_thermometer}
 - instance: [sensor]
   id: i2cspm
-- {id: in_place_ota_dfu}
 - {id: mpu}
 - {id: printf}
 - {id: rail_util_pti}

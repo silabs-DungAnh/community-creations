@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="uc.module.setup.componentSetup.com.silabs.ss.framework.project.toolchain.core.default#com.silabs.ss.tool.ide.arm.toolchain.gnu.cdt:12.2.1.20221205.gcc" propertyScope="project">
   <folder name="image">
-    <file name="readme_img0.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img0.png"/>
-    <file name="readme_img1.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img1.png"/>
-    <file name="readme_img2.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img2.png"/>
-    <file name="readme_img3.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img3.png"/>
-    <file name="readme_img4.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img4.png"/>
-    <file name="readme_img5.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img5.png"/>
-    <file name="readme_img6.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img6.png"/>
-    <file name="readme_img7.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img7.png"/>
-    <file name="readme_img8.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img8.png"/>
-    <file name="readme_img9.png" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/image/readme_img9.png"/>
+    <file name="readme_img0.png" linked="false" uri="studio:/project/image/readme_img0.png"/>
+    <file name="readme_img1.png" linked="false" uri="studio:/project/image/readme_img1.png"/>
+    <file name="readme_img2.png" linked="false" uri="studio:/project/image/readme_img2.png"/>
+    <file name="readme_img3.png" linked="false" uri="studio:/project/image/readme_img3.png"/>
+    <file name="readme_img4.png" linked="false" uri="studio:/project/image/readme_img4.png"/>
+    <file name="readme_img5.png" linked="false" uri="studio:/project/image/readme_img5.png"/>
+    <file name="readme_img6.png" linked="false" uri="studio:/project/image/readme_img6.png"/>
+    <file name="readme_img7.png" linked="false" uri="studio:/project/image/readme_img7.png"/>
+    <file name="readme_img8.png" linked="false" uri="studio:/project/image/readme_img8.png"/>
+    <file name="readme_img9.png" linked="false" uri="studio:/project/image/readme_img9.png"/>
   </folder>
   <folder name="simplicity_sdk_2025.6.1">
     <folder name="platform">
@@ -714,6 +714,23 @@
             <file name="app_log.h" linked="false" uri="studio:/sdk/app/common/util/app_log/app_log.h"/>
             <file name="sl_app_log.h" linked="false" uri="studio:/sdk/app/common/util/app_log/sl_app_log.h"/>
           </folder>
+          <folder name="app_queue">
+            <file name="app_queue.c" linked="false" uri="studio:/sdk/app/common/util/app_queue/app_queue.c"/>
+            <file name="app_queue.h" linked="false" uri="studio:/sdk/app/common/util/app_queue/app_queue.h"/>
+          </folder>
+          <folder name="app_rta">
+            <folder name="src">
+              <folder name="bm">
+                <file name="app_rta_bm.c" linked="false" uri="studio:/sdk/app/common/util/app_rta/src/bm/app_rta_bm.c"/>
+              </folder>
+            </folder>
+            <folder name="inc">
+              <folder name="bm">
+                <file name="app_rta_internal_bm.h" linked="false" uri="studio:/sdk/app/common/util/app_rta/inc/bm/app_rta_internal_bm.h"/>
+              </folder>
+              <file name="app_rta.h" linked="false" uri="studio:/sdk/app/common/util/app_rta/inc/app_rta.h"/>
+            </folder>
+          </folder>
           <folder name="app_timer">
             <folder name="bm">
               <file name="app_timer.c" linked="false" uri="studio:/sdk/app/common/util/app_timer/bm/app_timer.c"/>
@@ -727,16 +744,17 @@
       </folder>
       <folder name="bluetooth">
         <folder name="common">
+          <folder name="app_ota_dfu">
+            <file name="sl_bt_app_ota_dfu.c" linked="false" uri="studio:/sdk/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.c"/>
+            <file name="sl_bt_app_ota_dfu.h" linked="false" uri="studio:/sdk/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.h"/>
+            <file name="sli_bt_app_ota_dfu.h" linked="false" uri="studio:/sdk/app/bluetooth/common/app_ota_dfu/sli_bt_app_ota_dfu.h"/>
+          </folder>
           <folder name="gatt_service_device_information_override">
             <file name="sl_gatt_service_device_information_override.h" linked="false" uri="studio:/sdk/app/bluetooth/common/gatt_service_device_information_override/sl_gatt_service_device_information_override.h"/>
           </folder>
           <folder name="health_thermometer">
             <file name="sl_health_thermometer.c" linked="false" uri="studio:/sdk/app/bluetooth/common/health_thermometer/sl_health_thermometer.c"/>
             <file name="sl_health_thermometer.h" linked="false" uri="studio:/sdk/app/bluetooth/common/health_thermometer/sl_health_thermometer.h"/>
-          </folder>
-          <folder name="in_place_ota_dfu">
-            <file name="sl_bt_in_place_ota_dfu.c" linked="false" uri="studio:/sdk/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.c"/>
-            <file name="sl_bt_in_place_ota_dfu.h" linked="false" uri="studio:/sdk/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.h"/>
           </folder>
           <folder name="sensor_rht">
             <file name="sl_sensor_rht.c" linked="false" uri="studio:/sdk/app/bluetooth/common/sensor_rht/sl_sensor_rht.c"/>
@@ -747,22 +765,7 @@
     </folder>
     <folder name="protocol">
       <folder name="bluetooth">
-        <folder name="src">
-          <file name="sl_apploader_util_s2.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sl_apploader_util_s2.c"/>
-          <file name="sli_bt_advertiser_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_advertiser_config.c"/>
-          <file name="sli_bt_connection_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_connection_config.c"/>
-          <file name="sli_bt_dynamic_gattdb_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_dynamic_gattdb_config.c"/>
-          <file name="sli_bt_l2cap_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_l2cap_config.c"/>
-          <file name="sli_bt_pawr_advertiser_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_pawr_advertiser_config.c"/>
-          <file name="sli_bt_periodic_advertiser_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_periodic_advertiser_config.c"/>
-          <file name="sli_bt_sync_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_sync_config.c"/>
-          <file name="sli_bt_accept_list_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_accept_list_config.c"/>
-          <file name="sli_bt_external_bondingdb_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_external_bondingdb_config.c"/>
-          <file name="sli_bt_host_adaptation.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_host_adaptation.c"/>
-          <file name="sl_bt_stack_init.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sl_bt_stack_init.c"/>
-        </folder>
         <folder name="inc">
-          <file name="sl_apploader_util.h" linked="false" uri="studio:/sdk/protocol/bluetooth/inc/sl_apploader_util.h"/>
           <file name="sl_bgapi.h" linked="false" uri="studio:/sdk/protocol/bluetooth/inc/sl_bgapi.h"/>
           <file name="sli_bgapi.h" linked="false" uri="studio:/sdk/protocol/bluetooth/inc/sli_bgapi.h"/>
           <file name="sli_bgapi_rtos_adaptation.h" linked="false" uri="studio:/sdk/protocol/bluetooth/inc/sli_bgapi_rtos_adaptation.h"/>
@@ -807,6 +810,19 @@
               </folder>
             </folder>
           </folder>
+        </folder>
+        <folder name="src">
+          <file name="sli_bt_advertiser_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_advertiser_config.c"/>
+          <file name="sli_bt_connection_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_connection_config.c"/>
+          <file name="sli_bt_dynamic_gattdb_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_dynamic_gattdb_config.c"/>
+          <file name="sli_bt_l2cap_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_l2cap_config.c"/>
+          <file name="sli_bt_pawr_advertiser_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_pawr_advertiser_config.c"/>
+          <file name="sli_bt_periodic_advertiser_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_periodic_advertiser_config.c"/>
+          <file name="sli_bt_sync_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_sync_config.c"/>
+          <file name="sli_bt_accept_list_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_accept_list_config.c"/>
+          <file name="sli_bt_external_bondingdb_config.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_external_bondingdb_config.c"/>
+          <file name="sli_bt_host_adaptation.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sli_bt_host_adaptation.c"/>
+          <file name="sl_bt_stack_init.c" linked="false" uri="studio:/sdk/protocol/bluetooth/src/sl_bt_stack_init.c"/>
         </folder>
         <folder name="bgstack">
           <folder name="ll">
@@ -1143,9 +1159,9 @@
       </folder>
     </folder>
   </folder>
-  <file name="app.c" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/app.c"/>
-  <file name="app.h" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/app.h"/>
-  <file name="readme.md" linked="false" uri="studio:/sdk/app/bluetooth/example/bt_soc_thermometer/readme.md"/>
+  <file name="app.c" linked="false" uri="studio:/project/app.c"/>
+  <file name="app.h" linked="false" uri="studio:/project/app.h"/>
+  <file name="readme.md" linked="false" uri="studio:/project/readme.md"/>
   <file name="app_bm.c" generated="true" linked="false"/>
   <file name="sl_gatt_service_device_information_override.c" generated="true" linked="false"/>
   <file name="main.c" generated="true" linked="false"/>
@@ -1164,10 +1180,14 @@
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/Device/SiliconLabs/EFR32MG24/Include"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_assert"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_log"/>
+  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/bluetooth/common/app_ota_dfu"/>
+  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_queue"/>
+  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_rta/inc"/>
+  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_rta/inc/bm"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_timer"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/common/util/app_timer/bm"/>
-  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/protocol/bluetooth/inc"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/common/inc"/>
+  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/protocol/bluetooth/inc"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/protocol/bluetooth/bgcommon/inc"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/protocol/bluetooth/bgstack/ll/inc"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/hardware/board/inc"/>
@@ -1194,7 +1214,6 @@
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/bluetooth/common/health_thermometer"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/service/hfxo_manager/inc"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/driver/i2cspm/inc"/>
-  <includePath uri="studio:/project/simplicity_sdk_2025.6.1/app/bluetooth/common/in_place_ota_dfu"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/service/interrupt_manager/inc"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/service/interrupt_manager/src"/>
   <includePath uri="studio:/project/simplicity_sdk_2025.6.1/platform/service/interrupt_manager/inc/arm"/>
@@ -1240,7 +1259,6 @@
   <macroDefinition name="EFR32MG24B220F1536IM48"/>
   <macroDefinition name="SL_CODE_COMPONENT_SYSTEM" value="system"/>
   <macroDefinition name="SL_APP_PROPERTIES"/>
-  <macroDefinition name="BOOTLOADER_APPLOADER" value="1"/>
   <macroDefinition name="SL_BOARD_NAME" value="&quot;BRD4002A&quot;"/>
   <macroDefinition name="SL_BOARD_REV" value="&quot;A07&quot;"/>
   <macroDefinition name="HARDWARE_BOARD_DEFAULT_RF_BAND_2400"/>
