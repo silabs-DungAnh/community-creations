@@ -456,11 +456,6 @@
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/api/sl_bt.xapi</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/inc/sl_apploader_util.h</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/inc/sl_apploader_util.h</locationURI>
-		</link>
-		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/inc/sl_bgapi.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/inc/sl_bgapi.h</locationURI>
@@ -576,11 +571,6 @@
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/inc/sli_bt_sync_config.h</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/src/sl_apploader_util_s2.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/src/sl_apploader_util_s2.c</locationURI>
-		</link>
-		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/src/sl_bt_stack_init.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/src/sl_bt_stack_init.c</locationURI>
@@ -646,6 +636,21 @@
 			<locationURI>STUDIO_SDK_LOC/util/third_party/printf/printf.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/app_ota_dfu/sli_bt_app_ota_dfu.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/app_ota_dfu/sli_bt_app_ota_dfu.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/gatt_service_device_information_override/sl_gatt_service_device_information_override.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/gatt_service_device_information_override/sl_gatt_service_device_information_override.h</locationURI>
@@ -659,16 +664,6 @@
 			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/health_thermometer/sl_health_thermometer.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/health_thermometer/sl_health_thermometer.h</locationURI>
-		</link>
-		<link>
-			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.c</locationURI>
-		</link>
-		<link>
-			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.h</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.h</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/sensor_rht/sl_sensor_rht.c</name>
@@ -704,6 +699,16 @@
 			<name>simplicity_sdk_2025.6.1/app/common/util/app_log/sl_app_log.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/app/common/util/app_log/sl_app_log.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/common/util/app_queue/app_queue.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/common/util/app_queue/app_queue.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/common/util/app_queue/app_queue.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/common/util/app_queue/app_queue.h</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/app/common/util/app_timer/app_timer.h</name>
@@ -1844,6 +1849,11 @@
 			<name>simplicity_sdk_2025.6.1/util/third_party/printf/src/iostream_printf.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/util/third_party/printf/src/iostream_printf.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/common/util/app_rta/inc/app_rta.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/common/util/app_rta/inc/app_rta.h</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/app/common/util/app_timer/bm/app_timer.c</name>
@@ -3244,6 +3254,16 @@
 			<name>simplicity_sdk_2025.6.1/util/third_party/mbedtls/include/psa/crypto_values.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/util/third_party/mbedtls/include/psa/crypto_values.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/common/util/app_rta/inc/bm/app_rta_internal_bm.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/common/util/app_rta/inc/bm/app_rta_internal_bm.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/app/common/util/app_rta/src/bm/app_rta_bm.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/app/common/util/app_rta/src/bm/app_rta_bm.c</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/platform/radio/rail_lib/chip/efr32/efr32xg2x/rail_chip_specific.h</name>

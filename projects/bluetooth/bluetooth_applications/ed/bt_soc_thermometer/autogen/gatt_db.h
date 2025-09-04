@@ -20,14 +20,15 @@ extern const sli_bt_gattdb_t gattdb;
 #define gattdb_hardware_revision_string       20
 #define gattdb_firmware_revision_string       22
 #define gattdb_system_id                      24
-#define gattdb_health_thermometer             25
-#define gattdb_temperature_measurement        27
-#define gattdb_temperature_type               30
-#define gattdb_intermediate_temperature       32
-#define gattdb_measurement_interval           35
-#define gattdb_valid_range                    37
-#define gattdb_ota                            38
-#define gattdb_ota_control                    40
+#define gattdb_ota                            25
+#define gattdb_ota_control                    27
+#define gattdb_ota_data                       29
+#define gattdb_health_thermometer             30
+#define gattdb_temperature_measurement        32
+#define gattdb_temperature_type               35
+#define gattdb_intermediate_temperature       37
+#define gattdb_measurement_interval           40
+#define gattdb_valid_range                    42
 
 #define gattdb_generic_attribute_len          2
 #define gattdb_service_changed_char_len       4
@@ -40,13 +41,13 @@ extern const sli_bt_gattdb_t gattdb;
 #define gattdb_hardware_revision_string_len   5
 #define gattdb_firmware_revision_string_len   8
 #define gattdb_system_id_len                  8
+#define gattdb_ota_len                        16
 #define gattdb_health_thermometer_len         2
 #define gattdb_temperature_measurement_len    17
 #define gattdb_temperature_type_len           1
 #define gattdb_intermediate_temperature_len   17
 #define gattdb_measurement_interval_len       2
 #define gattdb_valid_range_len                4
-#define gattdb_ota_len                        16
 
 
 #endif // __GATT_DB_H

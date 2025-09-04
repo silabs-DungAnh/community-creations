@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file
- * @brief Application Properties Header File
+ * @brief Application Over-the-Air Device Firmware Update Configuration header
  *******************************************************************************
  * # License
- * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -27,39 +27,36 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+#ifndef SL_BT_APP_OTA_DFU_CONFIG_H
+#define SL_BT_APP_OTA_DFU_CONFIG_H
 
-#ifndef APP_PROPERTIES_CONFIG_H
-#define APP_PROPERTIES_CONFIG_H
+/***********************************************************************************************//**
+ * @addtogroup app_ota_dfu
+ * @{
+ **************************************************************************************************/
 
-#include "sl_application_type.h"
+#include "app_rta.h"
 
 // <<< Use Configuration Wizard in Context Menu >>>
 
-// <h>App Properties settings
+// <o SL_BT_APP_OTA_DFU_CONFIG_PRIORITY> Runtime context priority
+// <APP_RTA_PRIORITY_LOW=> Low
+// <APP_RTA_PRIORITY_BELOW_NORMAL=> Below normal
+// <APP_RTA_PRIORITY_NORMAL=> Normal
+// <APP_RTA_PRIORITY_ABOVE_NORMAL=> Above normal
+// <APP_RTA_PRIORITY_HIGH=> High
+// <i> Default: Normal
+#define SL_BT_APP_OTA_DFU_CONFIG_PRIORITY      APP_RTA_PRIORITY_NORMAL
 
-// Type of signature this application is signed with
-// Default: APPLICATION_SIGNATURE_NONE(0)
-#define SL_APPLICATION_SIGNATURE               0
+// <o SL_BT_APP_OTA_DFU_CONFIG_STACK> Stack size (in bytes)
+// <i> Default: 2560
+#define SL_BT_APP_OTA_DFU_CONFIG_STACK         2560
 
-// Location of the signature
-// Default: 0xFFFFFFFF
-#define SL_APPLICATION_SIGNATURE_LOCATION      0xFFFFFFFF
+// <o SL_BT_APP_OTA_DFU_CONFIG_WAIT> Timeout for guard (in ticks)
+// <i> Default: 10
+#define SL_BT_APP_OTA_DFU_CONFIG_WAIT          10
 
-// Bitfield representing type of application
-#define SL_APPLICATION_TYPE                    APPLICATION_TYPE
+// <<< end of configuration section >>>
 
-// <o SL_APPLICATION_VERSION> Version number for this application
-// <0-4294967295:1>
-// <i> Default: 1 [0-4294967295]
-#define SL_APPLICATION_VERSION                 1
-
-// Capabilities of this application
-// Default: 0
-#define SL_APPLICATION_CAPABILITIES            0
-
-//Product ID of the device for which the application is built
-#define SL_APPLICATION_PRODUCT_ID             { 0 }
-
-// </h>
-
-#endif // APP_PROPERTIES_CONFIG_H
+/** @} (end addtogroup app_ota_dfu) */
+#endif // SL_BT_APP_OTA_DFU_CONFIG_H
