@@ -636,11 +636,6 @@
 			<locationURI>STUDIO_SDK_LOC/util/third_party/printf/printf.h</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.c</locationURI>
-		</link>
-		<link>
 			<name>simplicity_sdk_2025.6.1/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/app/bluetooth/common/app_ota_dfu/sl_bt_app_ota_dfu.h</locationURI>

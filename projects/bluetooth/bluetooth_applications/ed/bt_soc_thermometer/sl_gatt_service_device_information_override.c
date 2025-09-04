@@ -62,7 +62,8 @@
 
 // -----------------------------------------------------------------------------
 // Check if the default values fit into the characteristic value buffers.
-
+//
+char firmware_version[] = {'2','0','2','5','.','v','0',' ',' ',' '};
 #if defined(gattdb_firmware_revision_string) && defined(gattdb_firmware_revision_string_len) && defined(FIRMWARE_REVISION_STRING)
 #define FIRMWARE_REVISION_STRING_LEN (sizeof(FIRMWARE_REVISION_STRING) - 1)
 static_assert(gattdb_firmware_revision_string_len >= FIRMWARE_REVISION_STRING_LEN,
@@ -103,8 +104,8 @@ void sl_gatt_service_device_information_override_on_event(sl_bt_msg_t *evt)
 #if defined(gattdb_firmware_revision_string) && defined(gattdb_firmware_revision_string_len) && defined(FIRMWARE_REVISION_STRING)
       sc = sl_bt_gatt_server_write_attribute_value(gattdb_firmware_revision_string,
                                                    0,
-                                                   sizeof(firmware_revision_string),
-                                                   firmware_revision_string);
+                                                   sizeof(firmware_version),
+                                                   firmware_version);
       app_assert_status(sc);
 #else
 // Skip setting Firmware Revision String.
