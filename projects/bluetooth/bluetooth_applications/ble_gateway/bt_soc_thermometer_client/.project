@@ -676,6 +676,106 @@
 			<locationURI>STUDIO_SDK_LOC/platform/emdrv/dmadrv/src/dmadrv.c</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/config/nvm3_config.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/config/nvm3_config.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_cache.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_cache.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_default.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_default.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_generic.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_generic.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_hal.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_hal.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_hal_flash.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_hal_flash.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_lock.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_lock.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_object.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_object.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_page.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_page.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_trace.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_trace.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_utils.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_utils.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_cache.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_cache.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_default_common_linker.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_default_common_linker.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_hal_flash.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_hal_flash.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_lock.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_lock.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_object.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_object.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_page.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_page.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_utils.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_utils.c</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/radio/rail_lib/common/rail.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/radio/rail_lib/common/rail.h</locationURI>
@@ -2241,6 +2341,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/sli_se_version_dependencies.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c</locationURI>
@@ -3041,6 +3146,21 @@
 			<locationURI>STUDIO_SDK_LOC/platform/radio/rail_lib/plugin/rail_util_built_in_phys/efr32xg24/sl_rail_rfsense_ook_config_40MHz.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/inc/psa/error.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/psa/error.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/inc/psa/internal_trusted_storage.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/psa/internal_trusted_storage.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/inc/psa/sli_internal_trusted_storage.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/psa/sli_internal_trusted_storage.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a</locationURI>
@@ -3061,9 +3181,9 @@
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a</name>
+			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb.a</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a</locationURI>
+			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb.a</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a</name>
@@ -3071,9 +3191,9 @@
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a</name>
+			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_client.a</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a</locationURI>
+			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_client.a</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_server.a</name>

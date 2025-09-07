@@ -312,6 +312,34 @@
             <file name="ecode.h" uri="studio:/sdk/platform/emdrv/common/inc/ecode.h"/>
           </folder>
         </folder>
+        <folder name="nvm3">
+          <folder name="inc">
+            <file name="nvm3_default.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_default.h"/>
+            <file name="nvm3.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3.h"/>
+            <file name="nvm3_generic.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_generic.h"/>
+            <file name="nvm3_cache.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_cache.h"/>
+            <file name="nvm3_hal.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_hal.h"/>
+            <file name="nvm3_hal_flash.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_hal_flash.h"/>
+            <file name="nvm3_lock.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_lock.h"/>
+            <file name="nvm3_object.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_object.h"/>
+            <file name="nvm3_page.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_page.h"/>
+            <file name="nvm3_trace.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_trace.h"/>
+            <file name="nvm3_utils.h" uri="studio:/sdk/platform/emdrv/nvm3/inc/nvm3_utils.h"/>
+          </folder>
+          <folder name="src">
+            <file name="nvm3_default_common_linker.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_default_common_linker.c"/>
+            <file name="nvm3.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3.c"/>
+            <file name="nvm3_cache.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_cache.c"/>
+            <file name="nvm3_hal_flash.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_hal_flash.c"/>
+            <file name="nvm3_lock.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_lock.c"/>
+            <file name="nvm3_object.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_object.c"/>
+            <file name="nvm3_page.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_page.c"/>
+            <file name="nvm3_utils.c" uri="studio:/sdk/platform/emdrv/nvm3/src/nvm3_utils.c"/>
+          </folder>
+          <folder name="config">
+            <file name="nvm3_config.h" uri="studio:/sdk/platform/emdrv/nvm3/config/nvm3_config.h"/>
+          </folder>
+        </folder>
       </folder>
       <folder name="emlib">
         <folder name="src">
@@ -411,6 +439,7 @@
               <file name="sli_psa_driver_init.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_init.c"/>
               <file name="sli_psa_driver_common.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c"/>
               <file name="sli_se_version_dependencies.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c"/>
+              <file name="sl_psa_its_nvm3.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c"/>
               <file name="sli_se_driver_builtin_keys.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c"/>
               <file name="sli_se_driver_key_management.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_management.c"/>
               <file name="sli_se_driver_key_derivation.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_key_derivation.c"/>
@@ -429,6 +458,11 @@
               <file name="sli_se_opaque_driver_aead.c" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/src/sli_se_opaque_driver_aead.c"/>
             </folder>
             <folder name="inc">
+              <folder name="psa">
+                <file name="internal_trusted_storage.h" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/inc/psa/internal_trusted_storage.h"/>
+                <file name="sli_internal_trusted_storage.h" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/inc/psa/sli_internal_trusted_storage.h"/>
+                <file name="error.h" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/inc/psa/error.h"/>
+              </folder>
               <file name="sli_psa_driver_common.h" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/inc/sli_psa_driver_common.h"/>
               <file name="sli_se_version_dependencies.h" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/inc/sli_se_version_dependencies.h"/>
               <file name="sli_psa_driver_features.h" uri="studio:/sdk/platform/security/sl_component/sl_psa_driver/inc/sli_psa_driver_features.h"/>
@@ -705,30 +739,23 @@
         <folder name="build">
           <folder name="gcc">
             <folder name="cortex-m33">
-              <folder name="bgapi_protocol">
-                <folder name="api3">
-                  <folder name="release">
-                    <file name="libbgapi_core.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/bgapi_protocol/api3/release/libbgapi_core.a"/>
-                  </folder>
-                </folder>
-              </folder>
               <folder name="ble_host">
-                <folder name="accept_list">
-                  <folder name="release">
-                    <file name="libble_host_accept_list_stub.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/accept_list/release/libble_host_accept_list_stub.a"/>
-                  </folder>
-                </folder>
                 <folder name="bgstack">
                   <folder name="release">
+                    <file name="libbondingdb.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb.a"/>
                     <file name="libble_host.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a"/>
-                    <file name="libbondingdb_stub.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a"/>
                   </folder>
                 </folder>
                 <folder name="ble_bgapi">
                   <folder name="release">
+                    <file name="libble_bgapi_gatt_client.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_client.a"/>
                     <file name="libble_bgapi.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a"/>
-                    <file name="libble_bgapi_stub_gatt_client.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a"/>
                     <file name="libble_bgapi_stub_gatt_server.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_server.a"/>
+                  </folder>
+                </folder>
+                <folder name="accept_list">
+                  <folder name="release">
+                    <file name="libble_host_accept_list_stub.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/accept_list/release/libble_host_accept_list_stub.a"/>
                   </folder>
                 </folder>
                 <folder name="ble_system">
@@ -759,6 +786,13 @@
                 <folder name="system">
                   <folder name="release">
                     <file name="libble_host_system.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/system/release/libble_host_system.a"/>
+                  </folder>
+                </folder>
+              </folder>
+              <folder name="bgapi_protocol">
+                <folder name="api3">
+                  <folder name="release">
+                    <file name="libbgapi_core.a" uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/bgapi_protocol/api3/release/libbgapi_core.a"/>
                   </folder>
                 </folder>
               </folder>
@@ -1044,6 +1078,8 @@
   <includePath uri="studio:/sdk/platform/service/memory_manager/src"/>
   <includePath uri="studio:/sdk/platform/service/memory_manager/profiler/inc"/>
   <includePath uri="studio:/sdk/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_eusart"/>
+  <includePath uri="studio:/sdk/platform/emdrv/nvm3/inc"/>
+  <includePath uri="studio:/sdk/platform/emdrv/nvm3/config"/>
   <includePath uri="studio:/sdk/platform/service/power_manager/inc"/>
   <includePath uri="studio:/sdk/util/third_party/printf"/>
   <includePath uri="studio:/sdk/util/third_party/printf/inc"/>
@@ -1104,12 +1140,12 @@
   <macroDefinition name="SL_CODE_COMPONENT_PSEC_OSAL" value="psec_osal"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a"/>
+  <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb.a"/>
+  <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_client.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/bgapi_protocol/api3/release/libbgapi_core.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/accept_list/release/libble_host_accept_list_stub.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a"/>
-  <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a"/>
-  <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_server.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_system/release/libble_system.a"/>
   <libraryFile uri="studio:/sdk/protocol/bluetooth/build/gcc/cortex-m33/ble_host/connection_subrating/release/libble_host_connection_subrating_stub.a"/>

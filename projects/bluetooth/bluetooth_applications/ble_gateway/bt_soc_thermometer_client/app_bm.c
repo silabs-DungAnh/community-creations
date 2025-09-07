@@ -1,9 +1,9 @@
 /***************************************************************************//**
  * @file
- * @brief SL_MX25_FLASH_SHUTDOWN_USART Config
+ * @brief Baremetal compatibility layer.
  *******************************************************************************
  * # License
- * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2025 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -27,41 +27,55 @@
  * 3. This notice may not be removed or altered from any source distribution.
  *
  ******************************************************************************/
+#include <stdint.h>
+#include <stdbool.h>
+#include "sl_core.h"
+#include "sl_main_init.h"
+#include "app.h"
 
-#ifndef SL_MX25_FLASH_SHUTDOWN_CONFIG_H
-#define SL_MX25_FLASH_SHUTDOWN_CONFIG_H
+// "Semaphore" indicating that it is required to execute application process action.
+static uint16_t proceed_request;
 
-// <<< sl:start pin_tool >>>
-// {eusart signal=TX,RX,SCLK} SL_MX25_FLASH_SHUTDOWN
-// [EUSART_SL_MX25_FLASH_SHUTDOWN]
-#define SL_MX25_FLASH_SHUTDOWN_PERIPHERAL        EUSART1
-#define SL_MX25_FLASH_SHUTDOWN_PERIPHERAL_NO     1
+// Application Runtime Init.
+void app_init_bt(void)
+{
+  proceed_request = 0;
+}
 
-// EUSART1 TX on PC01
-#define SL_MX25_FLASH_SHUTDOWN_TX_PORT           SL_GPIO_PORT_C
-#define SL_MX25_FLASH_SHUTDOWN_TX_PIN            1
+// Proceed with execution.
+void app_proceed(void)
+{
+  CORE_DECLARE_IRQ_STATE;
+  CORE_ENTER_CRITICAL();
+  if (proceed_request < UINT16_MAX) {
+    proceed_request++;
+  }
+  CORE_EXIT_CRITICAL();
+}
 
-// EUSART1 RX on PC02
-#define SL_MX25_FLASH_SHUTDOWN_RX_PORT           SL_GPIO_PORT_C
-#define SL_MX25_FLASH_SHUTDOWN_RX_PIN            2
+// Check if it is required to process with execution.
+bool app_is_process_required(void)
+{
+  bool ret = false;
+  CORE_DECLARE_IRQ_STATE;
+  CORE_ENTER_CRITICAL();
+  if (proceed_request > 0) {
+    proceed_request--;
+    ret = true;
+  }
+  CORE_EXIT_CRITICAL();
+  return ret;
+}
 
-// EUSART1 SCLK on PC03
-#define SL_MX25_FLASH_SHUTDOWN_SCLK_PORT         SL_GPIO_PORT_C
-#define SL_MX25_FLASH_SHUTDOWN_SCLK_PIN          3
+// Acquire access to protected variables
+bool app_mutex_acquire(void)
+{
+  // There are no tasks to protect shared resources from.
+  return true;
+}
 
-// [EUSART_SL_MX25_FLASH_SHUTDOWN]
-
-// <gpio> SL_MX25_FLASH_SHUTDOWN_CS
-
-// $[GPIO_SL_MX25_FLASH_SHUTDOWN_CS]
-#ifndef SL_MX25_FLASH_SHUTDOWN_CS_PORT          
-#define SL_MX25_FLASH_SHUTDOWN_CS_PORT           SL_GPIO_PORT_C
-#endif
-#ifndef SL_MX25_FLASH_SHUTDOWN_CS_PIN           
-#define SL_MX25_FLASH_SHUTDOWN_CS_PIN            4
-#endif
-// [GPIO_SL_MX25_FLASH_SHUTDOWN_CS]$
-
-// <<< sl:end pin_tool >>>
-
-#endif // SL_MX25_FLASH_SHUTDOWN_CONFIG_H
+// Finish access to protected variables
+void app_mutex_release(void)
+{
+  // There are no tasks to protect shared resources from.
+}

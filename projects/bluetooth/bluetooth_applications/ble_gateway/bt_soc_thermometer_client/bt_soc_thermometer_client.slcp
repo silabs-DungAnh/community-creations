@@ -6,9 +6,16 @@ component:
 - {id: app_assert}
 - {id: app_log}
 - {id: bgapi_protocol}
+- {id: bluetooth_feature_advertiser}
 - {id: bluetooth_feature_connection_role_central}
+- {id: bluetooth_feature_gap}
+- {id: bluetooth_feature_gatt}
+- {id: bluetooth_feature_l2cap}
+- {id: bluetooth_feature_legacy_advertiser}
 - {id: bluetooth_feature_legacy_scanner}
 - {id: bluetooth_feature_power_control}
+- {id: bluetooth_feature_sm}
+- {id: bluetooth_feature_system}
 - {id: bluetooth_stack}
 - {id: board_control}
 - {id: brd4002a}
