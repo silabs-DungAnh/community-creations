@@ -6,5 +6,11 @@
     <properties key="universalConfig.generationDirectory" value=""/>
     <properties key="universalConfig.toolchainCompatibility" value="iar gcc"/>
     <properties key="universalConfig.compSelProjInstanceId" value="1756971371434"/>
+    <properties key="projectCommon.boardIds" value="brd4187c:0.0.0.A01 brd4002a:0.0.0.A06"/>
+    <properties key="projectCommon.kitId" value=""/>
+    <properties key="projectCommon.partId" value="mcu.arm.efr32.mg24.efr32mg24b220f1536im48"/>
+    <properties key="universalConfig.projectTypeIds" value="com.silabs.ss.framework.ide.project.core.cdtMbsProjectType"/>
+    <properties key="projectCommon.overwriteCopiedSources" value="false"/>
+    <properties key="projectCommon.importModeId" value="LINK_LIBRARIES"/>
   </descriptors>
 </model:MDescriptors>

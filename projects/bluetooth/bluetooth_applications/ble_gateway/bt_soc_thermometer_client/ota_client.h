@@ -38,5 +38,5 @@ void send_dfu_block(void);
 void send_dfu_packet_with_confirmation(void);
 void init_ota_client(uint8_t connection, uint16_t control_char, uint16_t data_char, uint16_t app_ver_char);
 uint8_t ota_client_get_connection(void);
-ota_states ota_client_get_state(void);
+ota_state_t ota_client_get_state(void);
 #endif // OTA_CLIENT_H

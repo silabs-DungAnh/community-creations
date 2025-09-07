@@ -1,4 +1,22 @@
 # Silicon Labs Project Configuration Tools: slcp, v0, Component selection file.
+sdk: {id: simplicity_sdk, version: 2025.6.1}
 toolchain_settings: []
+component:
+- {id: EFR32MG24B220F1536IM48}
+- {id: app_assert}
+- {id: app_log}
+- {id: bgapi_protocol}
+- {id: bluetooth_feature_connection_role_central}
+- {id: bluetooth_feature_legacy_scanner}
+- {id: bluetooth_feature_power_control}
+- {id: bluetooth_stack}
+- {id: board_control}
+- {id: brd4002a}
+- {id: brd4187c}
+- {id: cli_core}
+- {id: gatt_configuration}
+- {id: printf}
+- {id: rail_util_pti}
+- {id: sl_main}
 ui_hints: {}
 

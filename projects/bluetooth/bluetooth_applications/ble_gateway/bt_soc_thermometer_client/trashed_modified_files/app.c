@@ -41,7 +41,7 @@
 #include "sl_main_init.h"
 #include "ota_client.h"
 #include "uuid_number.h"
-#include "procedure_event_queue.h"
+
 // connection parameters
 #define CONN_INTERVAL_MIN             80   //100ms
 #define CONN_INTERVAL_MAX             80   //100ms
@@ -180,9 +180,9 @@ static uint8_t active_connections_num;
 // State of the connection under establishment
 static conn_state_t conn_state;
 //procedure event queue
-procedure_queue_t procedure_queue;
+
 //connection for OTA
-static uint8_t ble_connection = INVALID_CONNECTION_HANDLE;
+static uint8_t ble_connection = CONNECTION_HANDLE_INVALID;
 ota_state_t ota_state = IDLE;
 static const uint8_t MAC_test[6] = { 0x4C, 0xA6, 0x45, 0xB1, 0x5C, 0x6C};
 

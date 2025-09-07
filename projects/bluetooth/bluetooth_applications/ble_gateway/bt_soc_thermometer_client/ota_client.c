@@ -30,7 +30,7 @@ static time_t dfu_start_time;
 #define MIN_MTU 23
 static uint32_t mtu = MIN_MTU;
 static uint16_t max_mtu = MAX_MTU;
-void ota_change_state(ota_states new_state)
+void ota_change_state(ota_state_t new_state)
 {
   ota_state = new_state;
   switch (ota_state) {
@@ -188,7 +188,7 @@ void send_dfu_block()
 uint8_t ota_client_get_connection(void) {
   return ble_connection;
 }
-ota_states ota_client_get_state(void) {
+ota_state_t ota_client_get_state(void) {
   return ota_state;
 }
 // ====== Main dispatcher ======
