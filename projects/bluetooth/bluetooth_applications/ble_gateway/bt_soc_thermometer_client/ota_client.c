@@ -4,9 +4,7 @@
 #define INVALID_CONNECTION_HANDLE 0xFF
 #define INVALID_CHARACTERISTIC_HANDLE 0xFFFF
 static time_t   dfu_start_time;
-static bd_addr remote_address;
-static uint8_t remote_address_type = 0;
-static int addr_found = 0;
+
 
 // ====== Helper ======
 
@@ -58,22 +56,11 @@ void ota_change_state(ota_state_t new_state)
     } break;
 
     case OTA_INIT: {
-      bd_addr address; uint8_t address_type;
-      sl_status_t sc = sl_bt_gap_get_identity_address(&address, &address_type);
-      if (sc) ERROR_EXIT("Error, get address failed,0x%x", sc);
-      app_log("Local %s address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-              address_type ? "static random" : "public device",
-              address.addr[5],address.addr[4],address.addr[3],
-              address.addr[2],address.addr[1],address.addr[0]);
+      app_log("OTA init...");
+      fopen
       if (dfu_read_size()) ERROR_EXIT("Error, DFU file read failed\n");
+      ota_change_state(OTA_READ_APPLICATION_VERSION);
     } break;
-
-    case OTA_RESET_TO_DFU: {
-      sl_status_t sc = sl_bt_gatt_write_characteristic_value(
-          ble_connection, ota_control_characteristic, 1, (uint8_t*)"\x00");
-      if (sc) ERROR_EXIT("Error, reset DFU failed,0x%x", sc);
-    } break;
-
     case OTA_READ_APPLICATION_VERSION:
       sl_bt_gatt_read_characteristic_value(ble_connection, application_version_characteristic);
       break;
@@ -190,5 +177,10 @@ uint8_t ota_client_get_connection(void) {
 }
 ota_state_t ota_client_get_state(void) {
   return ota_state;
+}
+size_t ota_store_read(uint32_t off, uint8_t *out, size_t max) {
+  size_t addr = OTA_PARTITION_BASE + sizeof(ota_header_t) + off;
+  flash_read(addr, out, max);
+  return max; // hoặc số đọc thực tế nếu chạm EOF
 }
 // ====== Main dispatcher ======

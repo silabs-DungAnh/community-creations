@@ -22,7 +22,6 @@ typedef enum {
   OTA_UPLOAD_WITHOUT_RSP,
   OTA_UPLOAD_WITH_RSP,
   OTA_END,
-  OTA_RESET_TO_DFU,
   IDLE
 } ota_state_t;
 // ====== Public APIs ======

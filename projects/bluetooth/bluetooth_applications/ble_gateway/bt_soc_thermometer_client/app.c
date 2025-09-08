@@ -185,7 +185,9 @@ static conn_state_t conn_state;
 static uint8_t ble_connection = CONNECTION_HANDLE_INVALID;
 ota_state_t ota_state = IDLE;
 static const uint8_t MAC_test[6] = { 0x4C, 0xA6, 0x45, 0xB1, 0x5C, 0x6C};
-
+uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
+uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
+uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
 // Print out tx power value
 static bool print_tx_power = PRINT_TX_POWER_DEFAULT;
 
@@ -388,7 +390,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
                 conn_properties[table_index].characteristic_handle.OTA_data_handle != CHARACTERISTIC_HANDLE_INVALID)
           conn_properties[table_index].characteristic_handle.OTA_data_handle= evt->data.evt_gatt_characteristic.characteristic; 
          
-          //save characteristic handle of device information service
+          //save characteris(tic handle of device information service
         else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_manufacturer_name &&
                 conn_properties[table_index].characteristic_handle.Manufacturer_name_handle != CHARACTERISTIC_HANDLE_INVALID)
           conn_properties[table_index].characteristic_handle.Manufacturer_name_handle= evt->data.evt_gatt_characteristic.characteristic;
@@ -416,16 +418,58 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
         break;
       }
       //for OTA 
-      ble_connection = ota_client_get_connection();
       if(ble_connection == evt->data.evt_gatt_procedure_completed.connection)
         {
           ota_state = ota_client_get_state();
           switch (ota_state)
           {
-          case OTA_BEGIN:
-            /* code */
+          case OTA_READ_APPLICATION_VERSION:
+            ota_change_state(OTA_READ_OTA_DATA_PROPERTIES);
             break;
-          
+          case OTA_READ_OTA_DATA_PROPERTIES:
+            ota_change_state(OTA_BEGIN);
+            break;
+          case OTA_BEGIN:
+            app_log("OK\n");
+            table_index = find_index_by_connection_handle(ble_connection);
+            if ((conn_properties[table_index].data.ota_data_properties & 0x0C) == 0) {
+              ERROR_EXIT("Wrong supported OTA Data properties\r\n");
+            } else {
+              if (conn_properties[table_index].data.ota_data_properties & 0x04) {     //Write without response is supported and forced
+                app_log("OTA DFU - write without response \n");
+                ota_change_state(OTA_UPLOAD_WITHOUT_RSP);
+              } else {
+                app_log("OTA DFU - write with response \n");
+                ota_change_state(OTA_UPLOAD_WITH_RSP);
+              }
+            }
+            break;
+          case OTA_UPLOAD_WITHOUT_RSP:
+            if (evt->data.evt_gatt_procedure_completed.result) {
+              ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+            }
+            send_dfu_block();
+            break;
+          case OTA_UPLOAD_WITH_RSP:
+            if (evt->data.evt_gatt_procedure_completed.result) {
+              ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+            }
+            send_dfu_packet_with_confirmation();
+            break; 
+          case OTA_END:
+            if (evt->data.evt_gatt_procedure_completed.result) {
+              ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+            }
+          app_log("OK\n");
+          ble_connection == CONNECTION_HANDLE_INVALID;
+          ota_state = IDLE;
+          ota_change_state(IDLE);
+          //reset all characteristic handle
+          uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
+          uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
+          uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
+          init_ota_client(CONNECTION_HANDLE_INVALID, CHARACTERISTIC_HANDLE_INVALID, CHARACTERISTIC_HANDLE_INVALID, CHARACTERISTIC_HANDLE_INVALID);
+            break;  
           default:
             break;
           }
