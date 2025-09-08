@@ -29,8 +29,9 @@
 
  MEMORY
  {
-   FLASH      (rx)  : ORIGIN = 0x8000000, LENGTH = 0x17e000
-   RAM        (rwx) : ORIGIN = 0x20000000, LENGTH = 0x40000
+   FLASH      (rx)  : ORIGIN = 0x8006000, LENGTH = 0x178000
+   RAM        (rwx) : ORIGIN = 0x20000004, LENGTH = 0x3fffc
+   BOOTLOADER_RESET_REGION (rwx) : ORIGIN = 0x20000000, LENGTH = 0x4
  }
 
 ENTRY(Reset_Handler)
@@ -48,6 +49,13 @@ SECTIONS
     __Vectors_Size = __Vectors_End - __Vectors;
     __lma_ramfuncs_start__ = .;
   } > FLASH
+  .bootloader_reset_section (NOLOAD):
+  {
+    __ResetReasonStart__ = .;
+    . = . + 4;
+    . = ALIGN(4);
+    __ResetReasonEnd__ = .;
+  } > BOOTLOADER_RESET_REGION
 
   .stack (NOLOAD):
   {
@@ -221,8 +229,8 @@ heap_size = heap_limit - __HeapBase;
   } > RAM
 
   __heap_size = __HeapLimit - __HeapBase;
-  __ram_end__ = 0x20000000 + 0x40000;
-  __main_flash_end__ = 0x8000000 + 0x17e000;
+  __ram_end__ = 0x20000004 + 0x3fffc;
+  __main_flash_end__ = 0x8006000 + 0x178000;
 
    /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
    * block sizes and then "place" them at the end of flash when the size is known. */
@@ -247,6 +255,6 @@ heap_size = heap_limit - __HeapBase;
   ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
 
 
-  app_flash_end = 0x8000000 + 0x17e000;
+  app_flash_end = 0x8006000 + 0x178000;
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= app_flash_end, "NVM3 is excessing the flash size !")
 }

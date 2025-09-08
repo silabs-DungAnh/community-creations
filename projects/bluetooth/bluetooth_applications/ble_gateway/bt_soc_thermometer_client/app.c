@@ -183,7 +183,7 @@ static conn_state_t conn_state;
 
 //connection for OTA
 static uint8_t ble_connection = CONNECTION_HANDLE_INVALID;
-ota_state_t ota_state = IDLE;
+ota_state_t ota_state = OTA_IDLE;
 static const uint8_t MAC_test[6] = { 0x4C, 0xA6, 0x45, 0xB1, 0x5C, 0x6C};
 uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
 uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
@@ -462,13 +462,13 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
             }
           app_log("OK\n");
           ble_connection == CONNECTION_HANDLE_INVALID;
-          ota_state = IDLE;
-          ota_change_state(IDLE);
+          ota_state = OTA_IDLE;
+          ota_change_state(OTA_IDLE);
           //reset all characteristic handle
           uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
           uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
           uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
-          init_ota_client(CONNECTION_HANDLE_INVALID, CHARACTERISTIC_HANDLE_INVALID, CHARACTERISTIC_HANDLE_INVALID, CHARACTERISTIC_HANDLE_INVALID);
+          init_ota_client(ble_connection, control_char, data_char, app_ver_char);
             break;  
           default:
             break;

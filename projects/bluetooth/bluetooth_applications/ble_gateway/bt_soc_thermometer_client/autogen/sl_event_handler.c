@@ -6,6 +6,7 @@
 #include "pa_conversions_efr32.h"
 #include "sl_rail_util_power_manager_init.h"
 #include "sl_rail_util_pti.h"
+#include "btl_interface.h"
 #include "sl_board_control.h"
 #include "app_log.h"
 #include "sl_bluetooth.h"
@@ -47,6 +48,7 @@ void sl_platform_init(void)
   sl_clock_manager_runtime_init();
   sl_hfxo_manager_init_hardware();
   sl_board_init();
+  bootloader_init();
   nvm3_initDefault();
 }
 

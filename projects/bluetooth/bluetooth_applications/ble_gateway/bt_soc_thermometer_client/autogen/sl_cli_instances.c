@@ -42,8 +42,6 @@ const uint32_t sl_cli_handles_count = sizeof(sl_cli_handles) / sizeof(sl_cli_han
 void sl_cli_instances_init(void)
 {
   sl_cli_instance_parameters_t instance_parameters;
-
-  
 }
 
 #if !defined(SL_CATALOG_KERNEL_PRESENT)

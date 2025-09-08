@@ -22,12 +22,11 @@ typedef enum {
   OTA_UPLOAD_WITHOUT_RSP,
   OTA_UPLOAD_WITH_RSP,
   OTA_END,
-  IDLE
+  OTA_IDLE
 } ota_state_t;
 // ====== Public APIs ======
 
 void ota_change_state(ota_state_t new_state);
-// ====== TODO: bạn hiện thực riêng các hàm này ======
 int  dfu_read_size(void);
 void sync_boot(void);
 bool match_target(const sl_bt_evt_scanner_legacy_advertisement_report_t *rpt);

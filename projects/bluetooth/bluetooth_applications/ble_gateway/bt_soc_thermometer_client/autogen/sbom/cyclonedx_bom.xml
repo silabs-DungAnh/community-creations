@@ -10,7 +10,7 @@ referenced in this SBOM.)
 -->
 <bom xmlns="http://cyclonedx.org/schema/bom/1.6" version="1">
   <metadata>
-    <timestamp>2025-09-07T16:15:43.822016500Z</timestamp>
+    <timestamp>2025-09-08T09:28:32.346080600Z</timestamp>
     <authors>
       <author>
         <name>Silicon Laboratories, Inc.</name>
@@ -65,6 +65,56 @@ referenced in this SBOM.)
             <expression>Zlib AND MSLA</expression>
           </licenses>
         </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_advertiser" type="library">
+          <name>Advertising Base Feature</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib AND MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_gap" type="library">
+          <name>GAP</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_gatt" type="library">
+          <name>GATT Client</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_l2cap" type="library">
+          <name>L2CAP</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib AND MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_legacy_advertiser" type="library">
+          <name>Legacy Advertising</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_legacy_scanner" type="library">
           <name>Scanner for legacy advertisements</name>
           <version>2025.6.1</version>
@@ -83,6 +133,26 @@ referenced in this SBOM.)
 	      </supplier>
           <licenses>
             <expression>Zlib AND MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_sm" type="library">
+          <name>Security Manager</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_system" type="library">
+          <name>System</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
           </licenses>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_stack" type="library">
@@ -185,6 +255,64 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_cipher_ecb" type="library">
+          <name>ECB Mode</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Apache-2.0</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_crypto_cipher_ecb:v3.6.2" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>Mbed TLS</name>
+                <version>v3.6.2</version>
+                <pedigree>
+                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_ecdh" type="library">
+          <name>ECDH</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Apache-2.0</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_crypto_ecdh:v3.6.2" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>Mbed TLS</name>
+                <version>v3.6.2</version>
+                <pedigree>
+                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
+        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:device_manager" type="library">
           <name>Device Manager</name>
           <version>2025.6.1</version>
@@ -204,6 +332,35 @@ referenced in this SBOM.)
           <licenses>
             <expression>Zlib</expression>
           </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_ecc_secp256r1" type="library">
+          <name>secp256r1</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Apache-2.0</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_crypto_ecc_secp256r1:v3.6.2" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>Mbed TLS</name>
+                <version>v3.6.2</version>
+                <pedigree>
+                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:emlib_eusart" type="library">
           <name>EUSART</name>
@@ -305,6 +462,36 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_source" type="library">
+          <name>NVM3 Core (source)</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_default_config" type="library">
+          <name>NVM3 Default Config</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_crypto" type="library">
+          <name>Bluetooth Core Crypto Configuration</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>MSLA</expression>
+          </licenses>
+        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_config" type="library">
           <name>Configuration</name>
           <version>2025.6.1</version>
@@ -343,6 +530,35 @@ referenced in this SBOM.)
           <licenses>
             <expression>Zlib</expression>
           </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_aes" type="library">
+          <name>AES Block Cipher</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Apache-2.0</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_crypto_aes:v3.6.2" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>Mbed TLS</name>
+                <version>v3.6.2</version>
+                <pedigree>
+                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_configuration" type="library">
           <name>Instantiation of Bluetooth configuration</name>
@@ -406,6 +622,16 @@ referenced in this SBOM.)
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:memory_manager_retention_control" type="library">
           <name>Memory Manager Retention Control</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_optimization_disable" type="library">
+          <name>NVM3 disable optimization</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -504,8 +730,8 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:rail_lib_singleprotocol" type="library">
-          <name>RAIL Library, Single Protocol</name>
+        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_builtin_bonding_database" type="library">
+          <name>Built-in Bluetooth bonding database</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -782,6 +1008,16 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_default" type="library">
+          <name>NVM3 Default Instance</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:se_manager_mailbox" type="library">
           <name>SE mailbox utilities</name>
           <version>2025.6.1</version>
@@ -801,6 +1037,35 @@ referenced in this SBOM.)
           <licenses>
             <expression>Zlib</expression>
           </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_ecc" type="library">
+          <name>ECC</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Apache-2.0</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_crypto_ecc:v3.6.2" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>Mbed TLS</name>
+                <version>v3.6.2</version>
+                <pedigree>
+                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:power_manager_handler_implementation" type="library">
           <name>Power Manager: Handler</name>
@@ -880,6 +1145,35 @@ referenced in this SBOM.)
           <licenses>
             <expression>Zlib</expression>
           </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_cmac" type="library">
+          <name>CMAC</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Apache-2.0</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_crypto_cmac:v3.6.2" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>Mbed TLS</name>
+                <version>v3.6.2</version>
+                <pedigree>
+                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:mbedtls_slcrypto_driver" type="library">
           <name>Drivers for Silicon Labs Crypto Acceleration</name>
@@ -1131,6 +1425,16 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_default_flash_backend" type="library">
+          <name>NVM3 back-end for default instance in flash</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib</expression>
+          </licenses>
+        </component>
         <component bom-ref="simplicity_sdk:2025.6.1:device_clock_hal" type="library">
           <name>Device Manager Clock HAL</name>
           <version>2025.6.1</version>
@@ -1260,6 +1564,35 @@ referenced in this SBOM.)
           <licenses>
             <expression>Zlib</expression>
           </licenses>
+        </component>
+        <component bom-ref="simplicity_sdk:2025.6.1:psa_its" type="library">
+          <name>PSA Persistent Storage Support (ITS)</name>
+          <version>2025.6.1</version>
+	      <supplier>
+	        <name>Silicon Laboratories, Inc.</name>
+	      </supplier>
+          <licenses>
+            <expression>Zlib AND MSLA AND BSD-3-Clause</expression>
+          </licenses>
+          <pedigree>
+            <ancestors>
+              <component bom-ref="psa_its:v1.5" type="library">
+                <supplier>
+                  <name>Trusted Firmware</name>
+                </supplier>
+                <name>TrustedFirmware-M (TF-M)</name>
+                <version>v1.5</version>
+                <pedigree>
+                  <notes>Trusted Firmware for M profile Arm CPUs</notes>
+                </pedigree>
+                <externalReferences>
+                  <reference type="website">
+                    <url>https://review.trustedfirmware.org/TF-M/trusted-firmware-m.git</url>
+                  </reference>
+                </externalReferences>
+              </component>
+            </ancestors>
+          </pedigree>
         </component>
         <component bom-ref="simplicity_sdk:2025.6.1:hal_eusart" type="library">
           <name>EUSART</name>
@@ -1567,18 +1900,8 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_advertiser" type="library">
-          <name>Advertising Base Feature</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib AND MSLA</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_legacy_advertiser" type="library">
-          <name>Legacy Advertising</name>
+        <component bom-ref="simplicity_sdk:2025.6.1:rail_lib_singleprotocol" type="library">
+          <name>RAIL Library, Single Protocol</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -1587,8 +1910,8 @@ referenced in this SBOM.)
             <expression>MSLA</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_gatt" type="library">
-          <name>GATT Client</name>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_storage_slots" type="library">
+          <name>Bootloader Storage Slot Setup</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -1597,8 +1920,8 @@ referenced in this SBOM.)
             <expression>MSLA</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_gap" type="library">
-          <name>GAP</name>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_interface" type="library">
+          <name>Bootloader Application Interface</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -1607,115 +1930,8 @@ referenced in this SBOM.)
             <expression>MSLA</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_l2cap" type="library">
-          <name>L2CAP</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib AND MSLA</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_sm" type="library">
-          <name>Security Manager</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_cipher_ecb" type="library">
-          <name>ECB Mode</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Apache-2.0</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_crypto_cipher_ecb:v3.6.2" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>Mbed TLS</name>
-                <version>v3.6.2</version>
-                <pedigree>
-                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_ecdh" type="library">
-          <name>ECDH</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Apache-2.0</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_crypto_ecdh:v3.6.2" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>Mbed TLS</name>
-                <version>v3.6.2</version>
-                <pedigree>
-                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_ecc_secp256r1" type="library">
-          <name>secp256r1</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Apache-2.0</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_crypto_ecc_secp256r1:v3.6.2" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>Mbed TLS</name>
-                <version>v3.6.2</version>
-                <pedigree>
-                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_source" type="library">
-          <name>NVM3 Core (source)</name>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_app_properties" type="library">
+          <name>App Properties</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>
@@ -1724,184 +1940,8 @@ referenced in this SBOM.)
             <expression>Zlib</expression>
           </licenses>
         </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_default_config" type="library">
-          <name>NVM3 Default Config</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_crypto" type="library">
-          <name>Bluetooth Core Crypto Configuration</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_aes" type="library">
-          <name>AES Block Cipher</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Apache-2.0</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_crypto_aes:v3.6.2" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>Mbed TLS</name>
-                <version>v3.6.2</version>
-                <pedigree>
-                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_optimization_disable" type="library">
-          <name>NVM3 disable optimization</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_builtin_bonding_database" type="library">
-          <name>Built-in Bluetooth bonding database</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>MSLA</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_default" type="library">
-          <name>NVM3 Default Instance</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_ecc" type="library">
-          <name>ECC</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Apache-2.0</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_crypto_ecc:v3.6.2" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>Mbed TLS</name>
-                <version>v3.6.2</version>
-                <pedigree>
-                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_crypto_cmac" type="library">
-          <name>CMAC</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Apache-2.0</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_crypto_cmac:v3.6.2" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>Mbed TLS</name>
-                <version>v3.6.2</version>
-                <pedigree>
-                  <notes>Mbed TLS is a C library implementing the PSA Cryptography API, cryptographic primitives, X.509 certificate manipulation and the SSL/TLS and DTLS protocols</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://github.com/Mbed-TLS/mbedtls.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:nvm3_default_flash_backend" type="library">
-          <name>NVM3 back-end for default instance in flash</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib</expression>
-          </licenses>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:psa_its" type="library">
-          <name>PSA Persistent Storage Support (ITS)</name>
-          <version>2025.6.1</version>
-	      <supplier>
-	        <name>Silicon Laboratories, Inc.</name>
-	      </supplier>
-          <licenses>
-            <expression>Zlib AND MSLA AND BSD-3-Clause</expression>
-          </licenses>
-          <pedigree>
-            <ancestors>
-              <component bom-ref="psa_its:v1.5" type="library">
-                <supplier>
-                  <name>Trusted Firmware</name>
-                </supplier>
-                <name>TrustedFirmware-M (TF-M)</name>
-                <version>v1.5</version>
-                <pedigree>
-                  <notes>Trusted Firmware for M profile Arm CPUs</notes>
-                </pedigree>
-                <externalReferences>
-                  <reference type="website">
-                    <url>https://review.trustedfirmware.org/TF-M/trusted-firmware-m.git</url>
-                  </reference>
-                </externalReferences>
-              </component>
-            </ancestors>
-          </pedigree>
-        </component>
-        <component bom-ref="simplicity_sdk:2025.6.1:bluetooth_feature_system" type="library">
-          <name>System</name>
+        <component bom-ref="simplicity_sdk:2025.6.1:bootloader_interface_s2" type="library">
+          <name>Bootloader Application Interface Series 2</name>
           <version>2025.6.1</version>
 	      <supplier>
 	        <name>Silicon Laboratories, Inc.</name>

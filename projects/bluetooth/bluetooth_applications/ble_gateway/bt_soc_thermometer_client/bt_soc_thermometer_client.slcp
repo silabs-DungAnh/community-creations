@@ -18,6 +18,8 @@ component:
 - {id: bluetooth_feature_system}
 - {id: bluetooth_stack}
 - {id: board_control}
+- {id: bootloader_interface}
+- {id: bootloader_storage_slots}
 - {id: brd4002a}
 - {id: brd4187c}
 - {id: cli_core}

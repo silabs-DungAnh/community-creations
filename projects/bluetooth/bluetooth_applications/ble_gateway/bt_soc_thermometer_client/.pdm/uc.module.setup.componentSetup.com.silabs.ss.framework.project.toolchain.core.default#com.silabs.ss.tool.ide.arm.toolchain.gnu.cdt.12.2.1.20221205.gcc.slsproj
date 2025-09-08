@@ -84,6 +84,28 @@
           <file name="sl_slist.c" uri="studio:/sdk/platform/common/src/sl_slist.c"/>
         </folder>
       </folder>
+      <folder name="bootloader">
+        <folder name="app_properties">
+          <file name="app_properties.c" uri="studio:/sdk/platform/bootloader/app_properties/app_properties.c"/>
+        </folder>
+        <folder name="api">
+          <file name="btl_interface.c" uri="studio:/sdk/platform/bootloader/api/btl_interface.c"/>
+          <file name="btl_interface_storage.c" uri="studio:/sdk/platform/bootloader/api/btl_interface_storage.c"/>
+          <file name="application_properties.h" uri="studio:/sdk/platform/bootloader/api/application_properties.h"/>
+          <file name="btl_errorcode.h" uri="studio:/sdk/platform/bootloader/api/btl_errorcode.h"/>
+          <file name="btl_interface.h" uri="studio:/sdk/platform/bootloader/api/btl_interface.h"/>
+          <file name="btl_interface_parser.h" uri="studio:/sdk/platform/bootloader/api/btl_interface_parser.h"/>
+          <file name="btl_interface_storage.h" uri="studio:/sdk/platform/bootloader/api/btl_interface_storage.h"/>
+          <file name="btl_reset_info.h" uri="studio:/sdk/platform/bootloader/api/btl_reset_info.h"/>
+        </folder>
+        <folder name="core">
+          <folder name="flash">
+            <file name="btl_internal_flash.c" uri="studio:/sdk/platform/bootloader/core/flash/btl_internal_flash.c"/>
+            <file name="btl_internal_flash.h" uri="studio:/sdk/platform/bootloader/core/flash/btl_internal_flash.h"/>
+          </folder>
+          <file name="btl_util.h" uri="studio:/sdk/platform/bootloader/core/btl_util.h"/>
+        </folder>
+      </folder>
       <folder name="service">
         <folder name="cli">
           <folder name="src">
@@ -1049,6 +1071,9 @@
   <includePath uri="studio:/sdk/protocol/bluetooth/bgcommon/inc"/>
   <includePath uri="studio:/sdk/protocol/bluetooth/bgstack/ll/inc"/>
   <includePath uri="studio:/sdk/hardware/board/inc"/>
+  <includePath uri="studio:/sdk/platform/bootloader"/>
+  <includePath uri="studio:/sdk/platform/bootloader/api"/>
+  <includePath uri="studio:/sdk/platform/bootloader/core/flash"/>
   <includePath uri="studio:/sdk/platform/service/cli/inc"/>
   <includePath uri="studio:/sdk/platform/service/cli/src"/>
   <includePath uri="studio:/sdk/platform/service/clock_manager/inc"/>
@@ -1106,6 +1131,7 @@
   <includePath uri="studio:/sdk/platform/service/udelay/inc"/>
   <macroDefinition name="EFR32MG24B220F1536IM48"/>
   <macroDefinition name="SL_CODE_COMPONENT_SYSTEM" value="system"/>
+  <macroDefinition name="SL_APP_PROPERTIES"/>
   <macroDefinition name="SL_BOARD_NAME" value="&quot;BRD4002A&quot;"/>
   <macroDefinition name="SL_BOARD_REV" value="&quot;A07&quot;"/>
   <macroDefinition name="HARDWARE_BOARD_DEFAULT_RF_BAND_2400"/>

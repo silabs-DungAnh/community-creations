@@ -1,0 +1,4 @@
+# Silicon Labs Project Configuration Tools: slcp, v0, Component selection file.
+toolchain_settings: []
+ui_hints: {}
+

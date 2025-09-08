@@ -1,7 +1,13 @@
 #CRC Codes for initially generated config files -- do not modify!
 app_assert_config.h=1479688922
 app_log_config.h=-1893283838
+app_properties_config.h=-763091270
 btconf/gatt_configuration.btconf=-286369816
+btl_aes_ctr_stream_block_cfg.h=224206831
+btl_core_cfg.h=475160307
+btl_interface_cfg.h=1648682198
+btl_interface_cfg_s2c4.h=-885736436
+btl_storage_slot_cfg.h=1725980385
 dmadrv_config.h=1207334949
 nvm3_default_config.h=44458093
 psa_crypto_config.h=1897542227
@@ -23,6 +29,7 @@ sl_core_config.h=-119586893
 sl_debug_swo_config.h=712797333
 sl_device_init_dcdc_config.h=1955081430
 sl_device_init_hfxo_config.h=-1192818336
+sl_fault_injection_hardening_cfg.h=-1478053728
 sl_hfxo_manager_config.h=1606678224
 sl_iostream_eusart_vcom_config.h=603639623
 sl_mbedtls_config.h=659926431
