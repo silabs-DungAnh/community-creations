@@ -118,6 +118,7 @@ typedef struct {
     uint32_t Model_number_handle;
     uint32_t Hardware_revision_handle;
     uint32_t Firmware_revision_handle;
+    uint32_t System_id_handle;
     uint32_t Temperature_measurement_handle;
     uint32_t Temperature_type_handle;
     uint32_t Measurement_interval_handle;
@@ -418,6 +419,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
         break;
       }
       //for OTA 
+        ble_connection = ota_client_get_connection();
       if(ble_connection == evt->data.evt_gatt_procedure_completed.connection)
         {
           ota_state = ota_client_get_state();
@@ -444,6 +446,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
               }
             }
             break;
+          
           case OTA_UPLOAD_WITHOUT_RSP:
             if (evt->data.evt_gatt_procedure_completed.result) {
               ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
@@ -473,7 +476,6 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
           default:
             break;
           }
-        
         }
       //for connecting multiple devices
       switch (conn_state) {
@@ -529,6 +531,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
           }
           conn_state = enable_indication;
           break;
+        
 
         case enable_indication:
           if (conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
@@ -539,7 +542,6 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
             conn_state = enable_notification;
             break;
           }
-      }
         if (conn_state == enable_notification) {
         // and we can connect to more devices
         if (active_connections_num < SL_BT_CONFIG_MAX_CONNECTIONS) {
@@ -553,6 +555,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
         }
         break;
       }
+    }
       break;
 
     // -------------------------------
@@ -612,13 +615,13 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
             else {
             app_log_warning("Characteristic value too short: %d" APP_LOG_NL,
                             evt->data.evt_gatt_characteristic_value.value.len);
-      }
+            }
             // Trigger RSSI measurement on the connection
             rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
             sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
             conn_properties[table_index].rssi = rssi;
             print_values();
-      }
+            }
       else if (evt->data.evt_gatt_characteristic_value.characteristic
                == conn_properties[table_index].characteristic_handle.Temperature_type_handle) {
             // The first byte of the characteristic value contains temperature type
@@ -628,21 +631,107 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
             else {
             app_log_warning("Characteristic value too short: %d" APP_LOG_NL,
                             evt->data.evt_gatt_characteristic_value.value.len);
-      }
+            }
             // Trigger RSSI measurement on the connection
             rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
             sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
             conn_properties[table_index].rssi = rssi;
             print_values();
-      }
+            }
       else if (evt->data.evt_gatt_characteristic_value.characteristic
                == conn_properties[table_index].characteristic_handle.Measurement_interval_handle)
-      {
-        
-      }
-      
-      break;
+            { 
+            if(evt->data.evt_gatt_characteristic_value.value.len >= 2) {
+              conn_properties[table_index].data.measurement_interval = 
+                (uint16_t)(evt->data.evt_gatt_characteristic_value.value.data[1] << 8) + evt->data.evt_gatt_characteristic_value.value.data[0];
+            }
+            else {
+            rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+            sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+            conn_properties[table_index].rssi = rssi;
+            print_values();
+          }
+          }
 
+    else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Manufacturer_name_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < MANUFACTURER_LEN) {
+              memcpy(conn_properties[table_index].data.manufacturer_name,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.manufacturer_name[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          }
+
+    else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Model_number_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < MODELNUM_MAX_LEN) {
+              memcpy(conn_properties[table_index].data.model_number,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.model_number[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          } 
+    else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Hardware_revision_handle)  
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < HWREV_MAX_LEN) {
+              memcpy(conn_properties[table_index].data.hardware_revision,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.hardware_revision[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          } 
+
+    else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Firmware_revision_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < FWREV_MAX_LEN) {
+              memcpy(conn_properties[table_index].data.firmware_revision,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.firmware_revision[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values(); 
+          }
+          }
+    else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.System_id_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len == SYSTEMID_LEN) {
+              memcpy(conn_properties[table_index].data.system_id,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          }
+      
+        break;
+            
     // -------------------------------
     // TX Power is updated
     case sl_bt_evt_connection_tx_power_id:
@@ -676,6 +765,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
       app_log_debug("BLE event: 0x%lx" APP_LOG_NL,
                     (unsigned long)SL_BT_MSG_ID(evt->header));
       break;
+
   }
 }
 
