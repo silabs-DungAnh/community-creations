@@ -182,12 +182,12 @@ static conn_state_t conn_state;
 //procedure event queue
 
 //connection for OTA
-static uint8_t ble_connection = CONNECTION_HANDLE_INVALID;
-ota_state_t ota_state = OTA_IDLE;
+static uint8_t ble_connection;
+ota_state_t ota_state;
 static const uint8_t MAC_test[6] = { 0x4C, 0xA6, 0x45, 0xB1, 0x5C, 0x6C};
-uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
-uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
-uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
+uint16_t control_char;
+uint16_t data_char;
+uint16_t app_ver_char;
 // Print out tx power value
 static bool print_tx_power = PRINT_TX_POWER_DEFAULT;
 
@@ -685,7 +685,11 @@ static void init_properties(void)
 {
   uint8_t i;
   active_connections_num = 0;
-
+  control_char = CHARACTERISTIC_HANDLE_INVALID;
+  data_char = CHARACTERISTIC_HANDLE_INVALID;
+  app_ver_char = CHARACTERISTIC_HANDLE_INVALID; 
+  ota_state = OTA_IDLE;
+  ble_connection = CONNECTION_HANDLE_INVALID; 
   for (i = 0; i < SL_BT_CONFIG_MAX_CONNECTIONS; i++) {
       conn_properties[i].connection_handle = CONNECTION_HANDLE_INVALID;
       conn_properties[i].rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
