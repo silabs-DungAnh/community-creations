@@ -14,13 +14,11 @@ static uint8_t ble_connection = INVALID_CONNECTION_HANDLE;
 static uint16_t ota_control_characteristic         = INVALID_CHARACTERISTIC_HANDLE;
 static uint16_t ota_data_characteristic            = INVALID_CHARACTERISTIC_HANDLE;
 static uint16_t application_version_characteristic = INVALID_CHARACTERISTIC_HANDLE;
-static uint32_t g_total    = 0; 
 //for OTA
 
 
 #define MAX_DFU_PACKET 256
 static uint8_t dfu_data[MAX_DFU_PACKET];
-static bool dfu_resync = false;
 static size_t dfu_toload = 0;
 static size_t dfu_total = 0;
 static size_t dfu_current_pos = 0;
