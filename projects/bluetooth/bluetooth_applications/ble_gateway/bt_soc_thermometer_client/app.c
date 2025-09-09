@@ -414,149 +414,151 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
     // This event is generated for various procedure completions, e.g. when a
     // write procedure is completed, or service discovery is completed
     case sl_bt_evt_gatt_procedure_completed_id:
-      table_index = find_index_by_connection_handle(evt->data.evt_gatt_procedure_completed.connection);
-      if (table_index == TABLE_INDEX_INVALID) {
-        break;
-      }
-      //for OTA 
-        ble_connection = ota_client_get_connection();
-      if(ble_connection == evt->data.evt_gatt_procedure_completed.connection)
-        {
-          ota_state = ota_client_get_state();
-          switch (ota_state)
+        table_index = find_index_by_connection_handle(evt->data.evt_gatt_procedure_completed.connection);
+        if (table_index == TABLE_INDEX_INVALID) {
+          break;
+        }
+        //for OTA 
+          ble_connection = ota_client_get_connection();
+        if(ble_connection == evt->data.evt_gatt_procedure_completed.connection)
           {
-          case OTA_READ_APPLICATION_VERSION:
-            ota_change_state(OTA_READ_OTA_DATA_PROPERTIES);
-            break;
-          case OTA_READ_OTA_DATA_PROPERTIES:
-            ota_change_state(OTA_BEGIN);
-            break;
-          case OTA_BEGIN:
-            app_log("OK\n");
-            table_index = find_index_by_connection_handle(ble_connection);
-            if ((conn_properties[table_index].data.ota_data_properties & 0x0C) == 0) {
-              ERROR_EXIT("Wrong supported OTA Data properties\r\n");
-            } else {
-              if (conn_properties[table_index].data.ota_data_properties & 0x04) {     //Write without response is supported and forced
-                app_log("OTA DFU - write without response \n");
-                ota_change_state(OTA_UPLOAD_WITHOUT_RSP);
+            ota_state = ota_client_get_state();
+          switch (ota_state)
+            {
+            case OTA_READ_APPLICATION_VERSION:
+              ota_change_state(OTA_READ_OTA_DATA_PROPERTIES);
+              break;
+            case OTA_READ_OTA_DATA_PROPERTIES:
+              ota_change_state(OTA_BEGIN);
+              break;
+            case OTA_BEGIN:
+              app_log("OK\n");
+              table_index = find_index_by_connection_handle(ble_connection);
+              if ((conn_properties[table_index].data.ota_data_properties & 0x0C) == 0) {
+                ERROR_EXIT("Wrong supported OTA Data properties\r\n");
               } else {
-                app_log("OTA DFU - write with response \n");
-                ota_change_state(OTA_UPLOAD_WITH_RSP);
+                if (conn_properties[table_index].data.ota_data_properties & 0x04) {     //Write without response is supported and forced
+                  app_log("OTA DFU - write without response \n");
+                  ota_change_state(OTA_UPLOAD_WITHOUT_RSP);
+                } else {
+                  app_log("OTA DFU - write with response \n");
+                  ota_change_state(OTA_UPLOAD_WITH_RSP);
+                }
               }
+              break;
+            
+            case OTA_UPLOAD_WITHOUT_RSP:
+              if (evt->data.evt_gatt_procedure_completed.result) {
+                ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+              }
+              send_dfu_block();
+              break;
+            case OTA_UPLOAD_WITH_RSP:
+              if (evt->data.evt_gatt_procedure_completed.result) {
+                ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+              }
+              send_dfu_packet_with_confirmation();
+              break; 
+            case OTA_END:
+              if (evt->data.evt_gatt_procedure_completed.result) {
+                ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+              }
+            app_log("OK\n");
+            ble_connection == CONNECTION_HANDLE_INVALID;
+            ota_state = OTA_IDLE;
+            ota_change_state(OTA_IDLE);
+            //reset all characteristic handle
+            uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
+            uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
+            uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
+            init_ota_client(ble_connection, control_char, data_char, app_ver_char);
+              break;  
+            default:
+              break;
             }
+          }
+        //end of OTA procedure
+        
+        //for connecting multiple devices
+        switch (conn_state) {
+          case discover_thermo_services:
+            // Discover OTA service on the responder device
+            sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_gatt_procedure_completed.connection,
+                                                              sizeof(uuid_ota_service),
+                                                              (const uint8_t*)uuid_ota_service);
+            app_assert_status(sc);
+            conn_state = discover_ota_services;
+            break;
+
+          case discover_ota_services:
+            // Discover Device Information service on the responder device
+            sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_gatt_procedure_completed.connection,
+                                                              sizeof(uuid_device_info_service),
+                                                              (const uint8_t*)uuid_device_info_service);
+            app_assert_status(sc);
+            conn_state = discover_dev_info_services;
+            break;
+
+          case discover_dev_info_services:
+            // Discover characteristics of Health Thermometer service
+            sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
+                                                    conn_properties[table_index].service_handle.Health_thermometer_handle);
+            app_assert_status(sc);
+            conn_state = discover_thermo_char;
+            break;
+
+          case discover_thermo_char:
+            // Discover characteristics of OTA service          
+            sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
+                                                    conn_properties[table_index].service_handle.OTA_handle);
+            app_assert_status(sc);
+            conn_state = discover_ota_char;
+            break;
+
+          case discover_ota_char:
+            // Discover characteristics of Device Information service
+            sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
+                                                    conn_properties[table_index].service_handle.Device_information_handle);
+            app_assert_status(sc);
+            // Enable indication of Temperature Measurement characteristic
+            conn_state = discover_dev_info_char;
+            break;
+
+          case discover_dev_info_char:
+            if (conn_properties[table_index].characteristic_handle.Temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
+              sc = sl_bt_gatt_set_characteristic_notification(evt->data.evt_gatt_procedure_completed.connection,
+                                                            conn_properties[table_index].characteristic_handle.Temperature_measurement_handle,
+                                                            sl_bt_gatt_indication);
+              app_assert_status(sc);
+            }
+            conn_state = enable_indication;
             break;
           
-          case OTA_UPLOAD_WITHOUT_RSP:
-            if (evt->data.evt_gatt_procedure_completed.result) {
-              ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+
+          case enable_indication:
+            if (conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
+              sc = sl_bt_gatt_set_characteristic_notification(evt->data.evt_gatt_procedure_completed.connection,
+                                                            conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle,
+                                                            sl_bt_gatt_notification);
+              app_assert_status(sc);
+              conn_state = enable_notification;
+              break;
             }
-            send_dfu_block();
-            break;
-          case OTA_UPLOAD_WITH_RSP:
-            if (evt->data.evt_gatt_procedure_completed.result) {
-              ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
-            }
-            send_dfu_packet_with_confirmation();
-            break; 
-          case OTA_END:
-            if (evt->data.evt_gatt_procedure_completed.result) {
-              ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
-            }
-          app_log("OK\n");
-          ble_connection == CONNECTION_HANDLE_INVALID;
-          ota_state = OTA_IDLE;
-          ota_change_state(OTA_IDLE);
-          //reset all characteristic handle
-          uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
-          uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
-          uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
-          init_ota_client(ble_connection, control_char, data_char, app_ver_char);
-            break;  
-          default:
-            break;
+          if (conn_state == enable_notification) {
+          // and we can connect to more devices
+          if (active_connections_num < SL_BT_CONFIG_MAX_CONNECTIONS) {
+            // start scanning again to find new devices
+            sc = sl_bt_scanner_start(sl_bt_scanner_scan_phy_1m,
+                                    sl_bt_scanner_discover_generic);
+            app_assert_status_f(sc, "Failed to start discovery #2" APP_LOG_NL);
+            conn_state = scanning;
+          } else {
+            conn_state = running;
           }
+          break;
         }
-      //for connecting multiple devices
-      switch (conn_state) {
-        case discover_thermo_services:
-          // Discover OTA service on the responder device
-          sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_gatt_procedure_completed.connection,
-                                                            sizeof(uuid_ota_service),
-                                                            (const uint8_t*)uuid_ota_service);
-          app_assert_status(sc);
-          conn_state = discover_ota_services;
-          break;
-
-        case discover_ota_services:
-          // Discover Device Information service on the responder device
-          sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_gatt_procedure_completed.connection,
-                                                            sizeof(uuid_device_info_service),
-                                                            (const uint8_t*)uuid_device_info_service);
-          app_assert_status(sc);
-          conn_state = discover_dev_info_services;
-          break;
-
-        case discover_dev_info_services:
-          // Discover characteristics of Health Thermometer service
-          sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
-                                                  conn_properties[table_index].service_handle.Health_thermometer_handle);
-          app_assert_status(sc);
-          conn_state = discover_thermo_char;
-          break;
-
-        case discover_thermo_char:
-          // Discover characteristics of OTA service          
-          sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
-                                                  conn_properties[table_index].service_handle.OTA_handle);
-          app_assert_status(sc);
-          conn_state = discover_ota_char;
-          break;
-
-        case discover_ota_char:
-          // Discover characteristics of Device Information service
-          sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
-                                                  conn_properties[table_index].service_handle.Device_information_handle);
-          app_assert_status(sc);
-          // Enable indication of Temperature Measurement characteristic
-          conn_state = discover_dev_info_char;
-          break;
-
-        case discover_dev_info_char:
-          if (conn_properties[table_index].characteristic_handle.Temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
-            sc = sl_bt_gatt_set_characteristic_notification(evt->data.evt_gatt_procedure_completed.connection,
-                                                           conn_properties[table_index].characteristic_handle.Temperature_measurement_handle,
-                                                           sl_bt_gatt_indication);
-            app_assert_status(sc);
-          }
-          conn_state = enable_indication;
-          break;
-        
-
-        case enable_indication:
-          if (conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
-            sc = sl_bt_gatt_set_characteristic_notification(evt->data.evt_gatt_procedure_completed.connection,
-                                                           conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle,
-                                                           sl_bt_gatt_notification);
-            app_assert_status(sc);
-            conn_state = enable_notification;
-            break;
-          }
-        if (conn_state == enable_notification) {
-        // and we can connect to more devices
-        if (active_connections_num < SL_BT_CONFIG_MAX_CONNECTIONS) {
-          // start scanning again to find new devices
-          sc = sl_bt_scanner_start(sl_bt_scanner_scan_phy_1m,
-                                   sl_bt_scanner_discover_generic);
-          app_assert_status_f(sc, "Failed to start discovery #2" APP_LOG_NL);
-          conn_state = scanning;
-        } else {
-          conn_state = running;
-        }
-        break;
       }
-    }
-      break;
+        break;
 
     // -------------------------------
     // This event is generated when a connection is dropped
@@ -653,7 +655,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
           }
           }
 
-    else if (evt->data.evt_gatt_characteristic_value.characteristic
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
              == conn_properties[table_index].characteristic_handle.Manufacturer_name_handle)
           {
             if(evt->data.evt_gatt_characteristic_value.value.len < MANUFACTURER_LEN) {
@@ -669,7 +671,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
           }
           }
 
-    else if (evt->data.evt_gatt_characteristic_value.characteristic
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
              == conn_properties[table_index].characteristic_handle.Model_number_handle)
           {
             if(evt->data.evt_gatt_characteristic_value.value.len < MODELNUM_MAX_LEN) {
@@ -684,7 +686,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
                   print_values();
           }
           } 
-    else if (evt->data.evt_gatt_characteristic_value.characteristic
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
              == conn_properties[table_index].characteristic_handle.Hardware_revision_handle)  
           {
             if(evt->data.evt_gatt_characteristic_value.value.len < HWREV_MAX_LEN) {
@@ -700,7 +702,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
           }
           } 
 
-    else if (evt->data.evt_gatt_characteristic_value.characteristic
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
              == conn_properties[table_index].characteristic_handle.Firmware_revision_handle)
           {
             if(evt->data.evt_gatt_characteristic_value.value.len < FWREV_MAX_LEN) {
@@ -715,7 +717,7 @@ void sl_bt_on_event(sl_bt_msg_t* evt)
                   print_values(); 
           }
           }
-    else if (evt->data.evt_gatt_characteristic_value.characteristic
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
              == conn_properties[table_index].characteristic_handle.System_id_handle)
           {
             if(evt->data.evt_gatt_characteristic_value.value.len == SYSTEMID_LEN) {
