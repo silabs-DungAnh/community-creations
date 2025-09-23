@@ -121,34 +121,13 @@ extern "C" {
  *
  ******************************************************************************/
 
-// Provide function declarations
-void hello(sl_cli_command_arg_t *arguments);
-void toggle_print_tx_power(sl_cli_command_arg_t *arguments);
 
-// Command structs. Names are in the format : cli_cmd_{command group name}_{command name}
-// In order to support hyphen in command and group name, every occurence of it while
-// building struct names will be replaced by "_hyphen_"
-static const sl_cli_command_info_t cli_cmd__hello = \
-  SL_CLI_COMMAND(hello,
-                 "hello",
-                  "",
-                 {SL_CLI_ARG_END, });
-
-static const sl_cli_command_info_t cli_cmd__toggle_print_tx_power = \
-  SL_CLI_COMMAND(toggle_print_tx_power,
-                 "Toggle to print tx power",
-                  "",
-                 {SL_CLI_ARG_END, });
-
-
-// Create group command tables and structs if cli_groups given
-// in template. Group name is suffixed with _group_table for tables
-// and group commands are cli_cmd_grp_( group name )
-// Create root command table
+/*******************************************************************************
+ * No template contributions supplied to project. Provide external definition
+ * of command table or regenerate project with template contributions.
+ ******************************************************************************/
 const sl_cli_command_entry_t sl_cli_default_command_table[] = {
-  { "hello", &cli_cmd__hello, false },
-  { "toggle_print_tx_power", &cli_cmd__toggle_print_tx_power, false },
-  { NULL, NULL, false },
+{ NULL, NULL, false }
 };
 
 

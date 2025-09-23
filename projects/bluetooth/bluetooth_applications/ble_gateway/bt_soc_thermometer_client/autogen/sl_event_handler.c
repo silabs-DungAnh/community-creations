@@ -6,21 +6,23 @@
 #include "pa_conversions_efr32.h"
 #include "sl_rail_util_power_manager_init.h"
 #include "sl_rail_util_pti.h"
+#include "btl_interface.h"
 #include "sl_board_control.h"
 #include "app_log.h"
-#include "app.h"
 #include "sl_bluetooth.h"
 #include "sl_debug_swo.h"
 #include "sl_gpio.h"
 #include "sl_iostream_init_eusart_instances.h"
 #include "sl_iostream_stdlib_config.h"
 #include "sl_mbedtls.h"
+#include "sl_uartdrv_instances.h"
 #include "sl_cli_instances.h"
 #include "psa/crypto.h"
 #include "sl_se_manager.h"
 #include "sli_protocol_crypto.h"
 #include "sli_crypto.h"
 #include "sl_iostream_init_instances.h"
+#include "nvm3_default.h"
 #include "sl_cos.h"
 #include "sl_iostream_handles.h"
 
@@ -47,17 +49,19 @@ void sl_platform_init(void)
   sl_clock_manager_runtime_init();
   sl_hfxo_manager_init_hardware();
   sl_board_init();
+  bootloader_init();
+  nvm3_initDefault();
 }
 
 void sli_internal_init_early(void)
 {
-  app_init_bt();
 }
 
 void sl_driver_init(void)
 {
   sl_debug_swo_init();
   sl_gpio_init();
+  sl_uartdrv_init_instances();
   sl_cos_send_config();
 }
 

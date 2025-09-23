@@ -51,6 +51,56 @@
 			<locationURI>STUDIO_SDK_LOC/hardware/board/src/sl_board_init.c</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/application_properties.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/application_properties.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_errorcode.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_errorcode.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_interface.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_interface.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_interface.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_interface.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_interface_parser.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_interface_parser.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_interface_storage.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_interface_storage.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_interface_storage.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_interface_storage.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/api/btl_reset_info.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/api/btl_reset_info.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/app_properties/app_properties.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/app_properties/app_properties.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/core/btl_util.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/core/btl_util.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/common/inc/sl_assert.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/common/inc/sl_assert.h</locationURI>
@@ -246,6 +296,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_timer.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emlib/inc/em_usart.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_usart.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/emlib/inc/em_version.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/inc/em_version.h</locationURI>
@@ -304,6 +359,11 @@
 			<name>simplicity_sdk_2025.6.1/platform/emlib/src/em_timer.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_timer.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emlib/src/em_usart.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emlib/src/em_usart.c</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/platform/peripheral/inc/peripheral_sysrtc.h</name>
@@ -366,6 +426,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/peripheral/inc/sl_hal_system_generic.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/peripheral/inc/sl_hal_usart.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/peripheral/inc/sl_hal_usart.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/peripheral/src/sl_hal_eusart.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/peripheral/src/sl_hal_eusart.c</locationURI>
@@ -389,6 +454,11 @@
 			<name>simplicity_sdk_2025.6.1/platform/peripheral/src/sl_hal_system.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/peripheral/src/sl_hal_system.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/peripheral/src/sl_hal_usart.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/peripheral/src/sl_hal_usart.c</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/api/sl_bt.xapi</name>
@@ -641,6 +711,16 @@
 			<locationURI>STUDIO_SDK_LOC/platform/CMSIS/Core/Include/tz_context.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/core/flash/btl_internal_flash.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/core/flash/btl_internal_flash.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/bootloader/core/flash/btl_internal_flash.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/bootloader/core/flash/btl_internal_flash.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/driver/debug/inc/sl_debug_swo.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/driver/debug/inc/sl_debug_swo.h</locationURI>
@@ -674,6 +754,116 @@
 			<name>simplicity_sdk_2025.6.1/platform/emdrv/dmadrv/src/dmadrv.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/emdrv/dmadrv/src/dmadrv.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/config/nvm3_config.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/config/nvm3_config.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_cache.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_cache.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_default.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_default.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_generic.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_generic.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_hal.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_hal.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_hal_flash.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_hal_flash.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_lock.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_lock.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_object.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_object.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_page.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_page.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_trace.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_trace.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/inc/nvm3_utils.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/inc/nvm3_utils.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_cache.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_cache.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_default_common_linker.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_default_common_linker.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_hal_flash.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_hal_flash.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_lock.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_lock.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_object.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_object.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_page.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_page.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/nvm3/src/nvm3_utils.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/nvm3/src/nvm3_utils.c</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/uartdrv/inc/uartdrv.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/uartdrv/inc/uartdrv.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/emdrv/uartdrv/src/uartdrv.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/emdrv/uartdrv/src/uartdrv.c</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/platform/radio/rail_lib/common/rail.h</name>
@@ -806,11 +996,6 @@
 			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/inc/sl_clock_manager.h</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/clock_manager/inc/sl_clock_manager_init.h</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/inc/sl_clock_manager_init.h</locationURI>
-		</link>
-		<link>
 			<name>simplicity_sdk_2025.6.1/platform/service/clock_manager/inc/sli_clock_manager.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/inc/sli_clock_manager.h</locationURI>
@@ -826,34 +1011,19 @@
 			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/src/sl_clock_manager_hal_s2.c</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/clock_manager/src/sl_clock_manager_init.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/src/sl_clock_manager_init.c</locationURI>
-		</link>
-		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c</locationURI>
-		</link>
-		<link>
 			<name>simplicity_sdk_2025.6.1/platform/service/clock_manager/src/sli_clock_manager_hal.h</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/src/sli_clock_manager_hal.h</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/clock_manager/src/sli_clock_manager_init_hal.h</name>
+			<name>simplicity_sdk_2025.6.1/platform/service/device_init/inc/sl_device_init_hfxo.h</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/clock_manager/src/sli_clock_manager_init_hal.h</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/service/device_init/inc/sl_device_init_hfxo.h</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/device_init/inc/sl_device_init_dcdc.h</name>
+			<name>simplicity_sdk_2025.6.1/platform/service/device_init/src/sl_device_init_hfxo_s2.c</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/device_init/inc/sl_device_init_dcdc.h</locationURI>
-		</link>
-		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/device_init/src/sl_device_init_dcdc_s2.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/device_init/src/sl_device_init_dcdc_s2.c</locationURI>
+			<locationURI>STUDIO_SDK_LOC/platform/service/device_init/src/sl_device_init_hfxo_s2.c</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/platform/service/device_manager/clocks/sl_device_clock_efr32xg24.c</name>
@@ -1054,16 +1224,6 @@
 			<name>simplicity_sdk_2025.6.1/platform/service/memory_manager/src/sli_memory_manager_common.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/service/memory_manager/src/sli_memory_manager_common.c</locationURI>
-		</link>
-		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/mpu/inc/sl_mpu.h</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/mpu/inc/sl_mpu.h</locationURI>
-		</link>
-		<link>
-			<name>simplicity_sdk_2025.6.1/platform/service/mpu/src/sl_mpu_s2.c</name>
-			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/platform/service/mpu/src/sl_mpu_s2.c</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/platform/service/power_manager/inc/sl_power_manager.h</name>
@@ -2271,6 +2431,11 @@
 			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/sli_se_version_dependencies.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/src/sl_psa_its_nvm3.c</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/src/sli_psa_driver_common.c</locationURI>
@@ -3071,6 +3236,21 @@
 			<locationURI>STUDIO_SDK_LOC/platform/radio/rail_lib/plugin/rail_util_built_in_phys/efr32xg24/sl_rail_rfsense_ook_config_40MHz.h</locationURI>
 		</link>
 		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/inc/psa/error.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/psa/error.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/inc/psa/internal_trusted_storage.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/psa/internal_trusted_storage.h</locationURI>
+		</link>
+		<link>
+			<name>simplicity_sdk_2025.6.1/platform/security/sl_component/sl_psa_driver/inc/psa/sli_internal_trusted_storage.h</name>
+			<type>1</type>
+			<locationURI>STUDIO_SDK_LOC/platform/security/sl_component/sl_psa_driver/inc/psa/sli_internal_trusted_storage.h</locationURI>
+		</link>
+		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a</name>
 			<type>1</type>
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a</locationURI>
@@ -3091,9 +3271,9 @@
 			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a</locationURI>
 		</link>
 		<link>
-			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a</name>
+			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb.a</name>
 			<type>1</type>
-			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a</locationURI>
+			<locationURI>STUDIO_SDK_LOC/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb.a</locationURI>
 		</link>
 		<link>
 			<name>simplicity_sdk_2025.6.1/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a</name>

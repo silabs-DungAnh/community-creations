@@ -10,12 +10,6 @@
 extern "C" {
 #endif
 
-void sl_cli_instances_init(void);
-#if !defined(SL_CATALOG_KERNEL_PRESENT)
-bool sl_cli_instances_is_ok_to_sleep(void);
-void sl_cli_instances_tick(void);
-#endif
-
 #ifdef __cplusplus
 }
 #endif

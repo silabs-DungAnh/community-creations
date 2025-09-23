@@ -9,7 +9,7 @@
 #include "sl_hal_gpio.h"
 
 
-#include "sl_clock_manager_tree_config.h"
+#include "em_cmu.h"
  
 
 
@@ -40,47 +40,14 @@
 #endif
 
 
-#if defined(EUART_COUNT) && (EUART_COUNT > 0)
-#define SL_IOSTREAM_EUSART_CLOCK_SOURCE(periph_nbr)      SL_CLOCK_MANAGER_EUART0CLK_SOURCE
-#define SL_IOSTREAM_EUSART_HF_CLOCK_SOURCE               CMU_EUART0CLKCTRL_CLKSEL_EM01GRPACLK
-#define SL_IOSTREAM_EUSART_DISABLED_CLOCK_SOURCE         CMU_EUART0CLKCTRL_CLKSEL_DISABLED
-#else
-#define SL_IOSTREAM_EUSART_CLOCK_SOURCE(periph_nbr)      SL_CLOCK_MANAGER_EUSART0CLK_SOURCE
-#if defined(CMU_EUSART0CLKCTRL_CLKSEL_EM01GRPCCLK)
-#define SL_IOSTREAM_EUSART_HF_CLOCK_SOURCE               CMU_EUSART0CLKCTRL_CLKSEL_EM01GRPCCLK
-#elif defined(CMU_EUSART0CLKCTRL_CLKSEL_EM01GRPACLK)
-#define SL_IOSTREAM_EUSART_HF_CLOCK_SOURCE               CMU_EUSART0CLKCTRL_CLKSEL_EM01GRPACLK
-#endif
-#define SL_IOSTREAM_EUSART_DISABLED_CLOCK_SOURCE         CMU_EUSART0CLKCTRL_CLKSEL_DISABLED
-#endif
-
-// Check clock configuration
  
-#if (SL_IOSTREAM_EUSART_CLOCK_SOURCE(SL_IOSTREAM_EUSART_VCOM_PERIPHERAL_NO) == \
-    SL_IOSTREAM_EUSART_DISABLED_CLOCK_SOURCE)
-  #error Peripheral clock is disabled for VCOM. Modify sl_clock_manager_tree_config.h \
-  to enable the peripheral clock
+#define _SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY  SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY
+
+#if defined(EUART_COUNT) && (EUART_COUNT > 0)
+#define SL_IOSTREAM_EUSART_CLOCK_SOURCE(periph_nbr)      SL_CONCAT_PASTER_2(cmuClock_EUART, periph_nbr)
 #else
-#define _SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY \
-          SL_IOSTREAM_EUSART_CLOCK_SOURCE(SL_IOSTREAM_EUSART_VCOM_PERIPHERAL_NO) == \
-          SL_IOSTREAM_EUSART_HF_CLOCK_SOURCE
-
-#if defined(SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY) && \
-  (_SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY != \
-  SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY)
-#if SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY
-#warning Configuration mismatch for IOStream EUSART VCOM. \
- IOStream was configured in high-frequency, but peripheral uses a low-frequency \
- oscillator in sl_clock_manager_tree_config.h.
-#else 
-#warning Configuration mismatch for IOStream EUSART VCOM. \
- IOStream was configured in low-frequency, but peripheral uses a high-frequency \
- oscillator in sl_clock_manager_tree_config.h.
-#endif // SL_IOSTREAM_EUSART_VCOM_ENABLE_HIGH_FREQUENCY
-#endif // Config mismatch
-#endif // SL_IOSTREAM_EUSART_DISABLED_CLOCK_SOURCE
-
-
+#define SL_IOSTREAM_EUSART_CLOCK_SOURCE(periph_nbr)      SL_CONCAT_PASTER_2(cmuClock_EUSART, periph_nbr)
+#endif
  
 
 
