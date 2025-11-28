@@ -9,7 +9,6 @@
 
 static uart_fsm_decoder_t test_decoder_init;
 
-
 #if UART_DECODER_MOCK_TEST
 void mock_test_decoder(void)
 {
@@ -25,7 +24,7 @@ void mock_test_decoder(void)
   };
 
   for (size_t i = 0; i < sizeof(test_packet); i++) {
-      uart_decode_fsm(&test_decoder_init, test_packet[i]);
+      decode_fsm(&test_decoder_init, test_packet[i]);
   }
 }
 #endif /*MOCK_DECODER_MOCK_TEST*/
@@ -51,8 +50,8 @@ void mock_test_uart(void)
 
 void app_init(void)
 {
-//  uart_init();
-  uart_fsm_decoder_init(&test_decoder_init);
+  uart_init();
+  fsm_decoder_init(&test_decoder_init);
 }
 
 /***************************************************************************/ /**
@@ -60,17 +59,17 @@ void app_init(void)
  ******************************************************************************/
 void app_process_action(void)
 {
-#if UART_DECODER_MOCK_TEST
-static bool ran = false;
-if (!ran) {
-  mock_test_decoder();
-  ran = true;
-}
-#endif /*UART_DECODER_MOCK_TEST*/
+  #if UART_DECODER_MOCK_TEST
+    static bool ran = false;
+    if (!ran) {
+      mock_test_decoder();
+      ran = true;
+    }
+  #endif /*UART_DECODER_MOCK_TEST*/
 
-#if MOCK_TEST_UART
-  mock_test_uart();
-#endif /*MOCK_TEST_UART*/
+  #if MOCK_TEST_UART
+    mock_test_uart();
+  #endif /*MOCK_TEST_UART*/
 }
 
 

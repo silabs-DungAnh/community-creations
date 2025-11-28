@@ -4,9 +4,10 @@
 #include "crc16.h"
 #include "string.h"
 
+#define PRINT_PAYLOAD_ENABLE 0
 
 // ==================== Initialization of the decoder =======================
-bool uart_fsm_decoder_init(uart_fsm_decoder_t *decoder) {
+bool fsm_decoder_init(uart_fsm_decoder_t *decoder) {
 
     if (!decoder) {
         DEBUGOUT ("Decoder pointer is NULL\n");
@@ -16,8 +17,8 @@ bool uart_fsm_decoder_init(uart_fsm_decoder_t *decoder) {
     decoder->state = WAIT_FOR_HEADER;
 
     memset(&decoder->packet, 0, sizeof(uart_packet_t));
-    memset(decoder->uart_payload_temp_buffer, 0, sizeof(decoder->uart_payload_temp_buffer));
-    decoder->uart_payload_temp_buffer_index = 0;
+    memset(decoder->packet_temp_buffer, 0, sizeof(decoder->packet_temp_buffer));
+    decoder->packet_temp_buffer_index = 0;
 
     decoder->calculated_crc = 0;
     decoder->received_crc = 0;
@@ -33,29 +34,19 @@ bool uart_fsm_decoder_init(uart_fsm_decoder_t *decoder) {
 }
 
 // ============================= DEBUG FUNCTIONS =============================
-void uart_fsm_print_stats(const uart_fsm_decoder_t *decoder) {
-   printf("\n=== PACKET STATISTICS ===\n");
-   printf("Total packets parsed: %lu\n", decoder->total_packets_parsed);
-   printf("Packets accepted: %lu\n", decoder->packets_accepted);
-   printf("Packets rejected: %lu\n", decoder->packets_rejected);
-   printf("  - Bad checksum: %lu\n", decoder->bad_checksum_count);
-   printf("  - Bad length: %lu\n", decoder->bad_length_count);
-   printf("========================\n");
-}
-
 void uart_fsm_print_packet(const uart_packet_t *packet){
-    printf("\n--- PACKET DETAILS ---\n");
-    printf("SOF: 0x%02X\n", packet->sof);
-    printf("Type: 0x%04X\n", packet->type);
-    printf("Length: %u\n", packet->length);
-    printf("Payload: ");
+    DEBUGOUT("\n--- PACKET DETAILS ---\n");
+    DEBUGOUT("SOF: 0x%02X\n", packet->sof);
+    DEBUGOUT("Type: 0x%04X\n", packet->type);
+    DEBUGOUT("Length: %u\n", packet->length);
+    DEBUGOUT("Payload: ");
     for (uint16_t i = 0; i < packet->length; i++) {
-        printf("%02X ", packet->payload[i]);
+        DEBUGOUT("%02X ", packet->payload[i]);
     }
-    printf("\nEndcode: 0x%02X\n", packet->endcode);
-    printf("CRC: 0x%04X\n", packet->crc);
-    printf("Tail: 0x%02X\n", packet->tail);
-    printf("----------------------\n");
+    DEBUGOUT("\nEndcode: 0x%02X\n", packet->endcode);
+    DEBUGOUT("CRC: 0x%04X\n", packet->crc);
+    DEBUGOUT("Tail: 0x%02X\n", packet->tail);
+    DEBUGOUT("----------------------\n");
 }
 
 // ============================= Validation functions =======================
@@ -80,74 +71,46 @@ bool packet_length_validate (uart_packet_t *pkt){
     return true;
 }
 
-bool payload_validate (payload_t *payload){
-
-    if (!payload) {
-        DEBUGOUT("Payload is NULL\n");
-        return false;
-    }
-
-    // Payload type validate
-    switch (payload->type) {
-        case TLV_HELLO:
-            DEBUGOUT("Payload TYPE: TLV_HELLO (0x%02X)\n", payload->type);
-            break;
-        default:
-            DEBUGOUT("Unknown TLV TYPE: 0x%02X\n", payload->type);
-            return false;
-    }
-
-    // Payload length validate
-    if (payload->length == 0 || payload->length > UART_MAX_PAYLOAD_LEN){
-        DEBUGOUT ("Payload length is invalid: %u\n", payload->length);
-        return false;
-    }
-
-    // Payload value validate
-    if (!payload->value){
-        DEBUGOUT ("Payload value is NULL\n");
-        return false;
-    }
-
-    DEBUGOUT("Payload VALUE: ");
-    for (uint16_t i = 0; i < payload->length; i++) {
-        DEBUGOUT("%02X ", payload->value[i]);
-    }
-    DEBUGOUT("\n");
-
-    return true;
-}
-
 // ==================================== Decode FSM =====================================
-void uart_decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
+void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
     switch (decoder->state) {
-        case WAIT_FOR_HEADER:
+        case WAIT_FOR_HEADER:{
+
             if (byte == UART_HEADER) {
                 decoder->packet.sof = byte;
                 // Print header
                 DEBUGOUT ("Received HEADER: 0x%02X\n", byte);
+
+                // Reset CRC accumulator
+                decoder->calculated_crc = CRC16_CCITT_INIT;
+
                 decoder->state = READ_TYPE;
                 DEBUGOUT("State: WAIT_FOR_HEADER -> READ_TYPE\n");
             }
             break;
+        }
 
         case READ_TYPE: {
-            if (decoder->uart_payload_temp_buffer_index == 0) {
+            if (decoder->packet_temp_buffer_index == 0) {
                 decoder->packet.type  = (uint16_t)byte;
-            } else if (decoder->uart_payload_temp_buffer_index == 1) {
+            } else if (decoder->packet_temp_buffer_index == 1) {
                 decoder->packet.type |= (uint16_t)byte << 8;
             }
-            decoder->uart_payload_temp_buffer_index++;
+            // CRC include TYPE
+            decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
+
+            decoder->packet_temp_buffer_index++;
+
 
             // Print when both bytes of TYPE are read
-            if (decoder->uart_payload_temp_buffer_index == 2) {
+            if (decoder->packet_temp_buffer_index == 2) {
                 DEBUGOUT("Received PACKET TYPE: 0x%04X\n", decoder->packet.type);
 
                 // Validate type
                 if (!packet_type_validate(&decoder->packet)) {
                     DEBUGOUT("Invalid type. Resetting to WAIT_FOR_HEADER\n");
                     decoder->state         = WAIT_FOR_HEADER;
-                    decoder->uart_payload_temp_buffer_index = 0;
+                    decoder->packet_temp_buffer_index = 0;
                     break;
                 }
 
@@ -158,29 +121,31 @@ void uart_decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
 
                 // State transition
                 decoder->state         = READ_LENGTH;
-                decoder->uart_payload_temp_buffer_index = 0;
+                decoder->packet_temp_buffer_index = 0;
                 DEBUGOUT("State: READ_TYPE -> READ_LENGTH\n");
             }
             break;
         }
 
         case READ_LENGTH: {
-            if (decoder->uart_payload_temp_buffer_index == 0) {
+            if (decoder->packet_temp_buffer_index == 0) {
                 decoder->packet.length = (uint16_t)byte;
-            } else if (decoder->uart_payload_temp_buffer_index == 1) {
+            } else if (decoder->packet_temp_buffer_index == 1) {
                 decoder->packet.length |= ((uint16_t)byte << 8);
             }
-            decoder->uart_payload_temp_buffer_index++;
+
+            // CRC include TYPE
+            decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
+
+            decoder->packet_temp_buffer_index++;
 
             // 2bytes read → validate length
-            if (decoder->uart_payload_temp_buffer_index == 2) {
+            if (decoder->packet_temp_buffer_index == 2) {
 
                 uint8_t len_LSB = (uint8_t)(decoder->packet.length & 0xFF);
                 uint8_t len_MSB = (uint8_t)((decoder->packet.length >> 8) & 0xFF);
 
-                DEBUGOUT("Packet LENGTH raw = %u (0x%04X)\n",
-                        decoder->packet.length,
-                        decoder->packet.length);
+                DEBUGOUT("Packet LENGTH raw = %u (0x%04X)\n",  decoder->packet.length, decoder->packet.length);
 
                 DEBUGOUT("Received LENGTH bytes: LSB=0x%02X, MSB=0x%02X\n",
                         len_LSB, len_MSB);
@@ -190,138 +155,118 @@ void uart_decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                     decoder->state = WAIT_FOR_HEADER;
                     decoder->bad_length_count++;
                     DEBUGOUT("Invalid length. Resetting to WAIT_FOR_HEADER\n");
-                    decoder->uart_payload_temp_buffer_index = 0;
+                    decoder->packet_temp_buffer_index = 0;
                     break;
                 }
 
                 // Transit to READ_PAYLOAD
                 decoder->state         = READ_PAYLOAD;
-                decoder->uart_payload_temp_buffer_index = 0;
+                decoder->packet_temp_buffer_index = 0;
                 DEBUGOUT("State: READ_LENGTH -> READ_PAYLOAD\n");
             }
 
             break;
         }
 
+        // TODO: Handle multiple TLV types in one payload
         case READ_PAYLOAD: {
             // Write byte to payload buffer
-            if (decoder->uart_payload_temp_buffer_index < UART_MAX_PACKET_LEN) {
-                decoder->uart_payload_temp_buffer[decoder->uart_payload_temp_buffer_index++] = byte;
+            if (decoder->packet_temp_buffer_index < UART_MAX_PACKET_LEN) {
+                decoder->packet_temp_buffer[decoder->packet_temp_buffer_index++] = byte;
+
+                // CRC include payload byte
+                decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
             } else {
                 DEBUGOUT("Payload buffer overflow. Resetting to WAIT_FOR_HEADER\n");
-                decoder->state         = WAIT_FOR_HEADER;
-                decoder->uart_payload_temp_buffer_index = 0;
+                decoder->state                       = WAIT_FOR_HEADER;
+                decoder->packet_temp_buffer_index    = 0;
                 decoder->packets_rejected++;
                 break;
             }
 
+
             // If received full payload
-            if (decoder->uart_payload_temp_buffer_index >= decoder->packet.length) {
-
-                // Temp payload struct to validate
-                payload_t pl;
-                pl.type   = decoder->uart_payload_temp_buffer[0];
-                pl.length = decoder->packet.length;
-                pl.value  = decoder->uart_payload_temp_buffer;
-
-                // Validate payload
-                if (!payload_validate(&pl)) {
-                    DEBUGOUT("Payload invalid. Resetting to WAIT_FOR_HEADER\n");
-                    decoder->state         = WAIT_FOR_HEADER;
-                    decoder->uart_payload_temp_buffer_index = 0;
-                    decoder->packets_rejected++;
-                    break;
-                }
-
+            if (decoder->packet_temp_buffer_index >= decoder->packet.length) {
                 // Copy from temp buffer to packet.payload
                 memcpy(decoder->packet.payload,
-                    decoder->uart_payload_temp_buffer,
+                    decoder->packet_temp_buffer,
                     decoder->packet.length);
+
+                #ifndef PRINT_PAYLOAD_ENABLE
+                // Print the full payload
+                for (uint16_t i = 0; i < decoder->packet.length; i++) {
+                    DEBUGOUT("Payload[%u]: 0x%02X\n", i, decoder->packet.payload[i]);
+                }
+                #endif
+
+                DEBUGOUT("Full payload received (%u bytes)\n", decoder->packet.length);
 
 
                 // State transition to READ_ENDCODE
-                decoder->state         = READ_ENDCODE;
-                decoder->uart_payload_temp_buffer_index = 0;
+                decoder->state                    = READ_ENDCODE;
+                decoder->packet_temp_buffer_index = 0;
                 DEBUGOUT("State: READ_PAYLOAD -> READ_ENDCODE\n");
             }
 
             break;
-}
+        }
 
-        case READ_ENDCODE:
+        case READ_ENDCODE: {
+
             if (byte == UART_ENDCODE) {
                 decoder->packet.endcode = byte;
 
                 // Print endcode
                 DEBUGOUT ("Received ENDCODE: 0x%02X\n", byte);
 
+                // CRC include TYPE
+                decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
+
                 decoder->state = READ_CRC;
-                decoder->uart_payload_temp_buffer_index = 0;
+                decoder->packet_temp_buffer_index = 0;
                 DEBUGOUT("State: READ_ENDCODE -> READ_CRC\n");
             } else {
                 decoder->state = WAIT_FOR_HEADER;
                 DEBUGOUT("Invalid endcode. Resetting to WAIT_FOR_HEADER\n");
             }
             break;
+        }
 
         case READ_CRC: {
-            if (decoder->uart_payload_temp_buffer_index == 0) {
-                decoder->received_crc = (uint16_t)byte;
-            } else if (decoder->uart_payload_temp_buffer_index == 1) {
-                decoder->received_crc |= (uint16_t)byte << 8;
+            // Receive 2 bytes of CRC
+            if (decoder->packet_temp_buffer_index == 0) {
+                decoder->received_crc = (uint16_t)byte;          // LSB
+            } else if (decoder->packet_temp_buffer_index == 1) {
+                decoder->received_crc |= (uint16_t)byte << 8;    // MSB
             }
-            decoder->uart_payload_temp_buffer_index++;
+            decoder->packet_temp_buffer_index++;
 
-            // Received full CRC (2 bytes)
-            if (decoder->uart_payload_temp_buffer_index == 2) {
-
-                // ====== Build buffer: TYPE(2) | LENGTH(2) | PAYLOAD(L) | ENDCODE(1) ======
-                uint16_t crc_len = 0;
-                uint8_t  crc_buf[4 + UART_MAX_PACKET_LEN + 1]; // 2 type + 2 len + payload + 1 endcode
-
-                // Type (LE)
-                crc_buf[crc_len++] = (uint8_t)(decoder->packet.type & 0xFF);        // LSB
-                crc_buf[crc_len++] = (uint8_t)((decoder->packet.type >> 8) & 0xFF); // MSB
-
-                // Length (LE)
-                crc_buf[crc_len++] = (uint8_t)(decoder->packet.length & 0xFF);        // LSB
-                crc_buf[crc_len++] = (uint8_t)((decoder->packet.length >> 8) & 0xFF); // MSB
-
-                // Payload
-                if (decoder->packet.length > 0) {
-                    memcpy(&crc_buf[crc_len],
-                        decoder->packet.payload,
-                        decoder->packet.length);
-                    crc_len += decoder->packet.length;
-                }
-
-                // Endcode (1 byte)
-                crc_buf[crc_len++] = decoder->packet.endcode;
-
-                // ====== Calculate CRC with the built buffer ======
-                decoder->calculated_crc = crc16_ccitt(crc_buf, crc_len);
+            // When received all 2 bytes of CRC
+            if (decoder->packet_temp_buffer_index == UART_CRC_SIZE) {
 
                 DEBUGOUT("Received CRC:    0x%04X\n", decoder->received_crc);
                 DEBUGOUT("Calculated CRC:  0x%04X\n", decoder->calculated_crc);
 
                 if (decoder->calculated_crc == decoder->received_crc) {
-                    decoder->packet.crc   = decoder->received_crc;
-                    decoder->state        = READ_TAIL;
-                    decoder->uart_payload_temp_buffer_index  = 0;
+                    decoder->packet.crc  = decoder->received_crc;
+                    decoder->state       = READ_TAIL;
                     DEBUGOUT("CRC OK. State: READ_CRC -> READ_TAIL\n");
                 } else {
-                    decoder->state             = WAIT_FOR_HEADER;
+                    decoder->state = WAIT_FOR_HEADER;
                     decoder->bad_checksum_count++;
                     decoder->packets_rejected++;
                     DEBUGOUT("CRC mismatch. Resetting to WAIT_FOR_HEADER\n");
-                    decoder->uart_payload_temp_buffer_index = 0;
                 }
+
+                // Reset index for next state
+                decoder->packet_temp_buffer_index = 0;
             }
             break;
-}
+        }
 
 
-        case READ_TAIL:
+        case READ_TAIL:{
+
             if (byte == UART_TAIL) {
                 decoder->packet.tail = byte;
                 decoder->total_packets_parsed++;
@@ -329,18 +274,21 @@ void uart_decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                 DEBUGOUT("Packet accepted!\n");
                 uart_fsm_print_packet(&decoder->packet);
                 decoder->state = WAIT_FOR_HEADER; // Reset for next packet
-                decoder->uart_payload_temp_buffer_index = 0;
+                decoder->packet_temp_buffer_index = 0;
                 DEBUGOUT("State: READ_TAIL -> WAIT_FOR_HEADER\n");
             } else {
                 decoder->state = WAIT_FOR_HEADER;
                 DEBUGOUT("Invalid tail. Resetting to WAIT_FOR_HEADER\n");
             }
             break;
+        }
 
-        default:
+        default:{
+
             decoder->state = WAIT_FOR_HEADER;
             DEBUGOUT("Unknown state. Resetting to WAIT_FOR_HEADER\n");
             break;
+        }
     }
 }
 

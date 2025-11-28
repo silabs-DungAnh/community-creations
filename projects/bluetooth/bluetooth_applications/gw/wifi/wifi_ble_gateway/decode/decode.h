@@ -26,29 +26,41 @@ typedef enum {
 } uart_packet_type_t;
 
 
-#define UART_HEADER     0xF0
-#define UART_ENDCODE    0xFF
-#define UART_TAIL       0x0F
-#define UART_MAX_PACKET_LEN 512
-#define UART_MAX_PAYLOAD_LEN 256
+
+#define UART_HEADER             0xF0
+#define UART_ENDCODE            0xFF
+#define UART_TAIL               0x0F
+#define UART_MAX_PACKET_LEN     512
+#define UART_MAX_PAYLOAD_LEN    256
+
+// Constants for calculating CRC
+#define UART_HEADER_SIZE        1
+#define UART_TYPE_SIZE          2
+#define UART_LENGTH_SIZE        2
+#define UART_ENCODE_SIZE        1
+#define UART_CRC_SIZE           2
+#define UART_TAIL_SIZE          1
+#define CRC16_FIXED_LENGTH      (UART_TYPE_SIZE + UART_LENGTH_SIZE  + UART_ENCODE_SIZE)
 
 
 // UART Packet structure
-typedef struct packet {
-    uint8_t sof;
-    uart_packet_type_t type;
-    uint16_t length;
-    uint8_t payload[UART_MAX_PAYLOAD_LEN];
-    uint8_t endcode;
-    uint16_t crc;
-    uint8_t tail;
-}  uart_packet_t;
+typedef struct {
+    uint8_t            sof;                             // 1 byte
+    uint16_t           type;                            // 2 bytes (uint16_t)
+    uint16_t           length;                          // 2 bytes
+    uint8_t          payload[UART_MAX_PAYLOAD_LEN];   // L max
+    uint8_t            endcode;                         // 1 byte
+    uint16_t           crc;                             // 2 bytes
+    uint8_t            tail;                            // 1 byte
+} uart_packet_t;
+
+
 
 // UART Payload structure
 typedef struct {
-    tlv_type_t type;
-    uint16_t length;
-    uint8_t  *value;
+    uint8_t  *value;   // 4 byte, align 4
+    tlv_type_t type;   // 1 byte (uint8_t)
+    uint16_t length;   // 2 byte
 } payload_t;
 
 // FSM states for UART decoding
@@ -66,8 +78,9 @@ typedef enum {
 typedef struct {
     uart_decode_state_t state;
     uart_packet_t packet;
-    uint8_t uart_payload_temp_buffer[UART_MAX_PAYLOAD_LEN];
-    uint16_t uart_payload_temp_buffer_index;
+    uint16_t packet_temp_buffer_index;
+    uint8_t packet_temp_buffer[UART_MAX_PACKET_LEN];
+    uint16_t payload_rx_len;
 
     // CRC
     uint16_t calculated_crc;
@@ -96,23 +109,18 @@ typedef enum {
 
 
 // Decoder initialization
-bool uart_fsm_decoder_init (uart_fsm_decoder_t *decoder);
-// void uart_fsm_decoder_reset (uart_fsm_decoder_t *decoder);
-
+bool fsm_decoder_init (uart_fsm_decoder_t *decoder);
 
 // Validation functions
 bool payload_validate(payload_t *payload);
 bool packet_type_validate (uart_packet_t *pkt);
 bool packet_length_validate (uart_packet_t *pkt);
 
-// Calculate crc16
-uint16_t crc16_ccitt(const uint8_t *data, uint16_t length);
-
 // Debug utilities
 void uart_print_stats(const uart_fsm_decoder_t *decoder);
 void uart_fsm_print_packet(const uart_packet_t *packet);
 
 // States machine for UART decoding
-void uart_decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte);
+void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte);
 
 #endif /* SRC_INC_DECODE_H_ */
