@@ -5,13 +5,17 @@
 #include "string.h"
 
 #define PRINT_PAYLOAD_ENABLE 0
+#define FSM_TYPE_DEBUG_ENABLE 0
+#define FSM_LENGTH_DEBUG_ENABLE 0
+#define FSM_CRC_DEBUG_ENABLE 0
+
 
 // ==================== Initialization of the decoder =======================
-bool fsm_decoder_init(uart_fsm_decoder_t *decoder) {
+uart_decode_error_t fsm_decoder_init(uart_fsm_decoder_t *decoder) {
 
     if (!decoder) {
-        DEBUGOUT ("Decoder pointer is NULL\n");
-        return false; // check NULL
+        DECODE_LOG ("Decoder pointer is NULL\n");
+        return UART_DECODE_INIT_FAILED; // check NULL
     }
 
     decoder->state = WAIT_FOR_HEADER;
@@ -29,46 +33,44 @@ bool fsm_decoder_init(uart_fsm_decoder_t *decoder) {
     decoder->bad_checksum_count = 0;
     decoder->bad_length_count = 0;
 
-    DEBUGOUT ("UART FSM Decoder initialized successfully\n");
-    return true;
+    DECODE_LOG ("UART FSM Decoder initialized successfully\n");
+    return UART_DECODE_INIT_SUCCESS;
 }
 
 // ============================= DEBUG FUNCTIONS =============================
 void uart_fsm_print_packet(const uart_packet_t *packet){
-    DEBUGOUT("\n--- PACKET DETAILS ---\n");
-    DEBUGOUT("SOF: 0x%02X\n", packet->sof);
-    DEBUGOUT("Type: 0x%04X\n", packet->type);
-    DEBUGOUT("Length: %u\n", packet->length);
-    DEBUGOUT("Payload: ");
+    DECODE_LOG("\n--- PACKET DETAILS ---\n");
+    DECODE_LOG("SOF: 0x%02X\n", packet->sof);
+    DECODE_LOG("Type: 0x%04X\n", packet->type);
+    DECODE_LOG("Length: %u\n", packet->length);
+    DECODE_LOG("Payload: ");
     for (uint16_t i = 0; i < packet->length; i++) {
-        DEBUGOUT("%02X ", packet->payload[i]);
+        DECODE_LOG("%02X ", packet->payload[i]);
     }
-    DEBUGOUT("\nEndcode: 0x%02X\n", packet->endcode);
-    DEBUGOUT("CRC: 0x%04X\n", packet->crc);
-    DEBUGOUT("Tail: 0x%02X\n", packet->tail);
-    DEBUGOUT("----------------------\n");
+    DECODE_LOG("\nEndcode: 0x%02X\n", packet->endcode);
+    DECODE_LOG("CRC: 0x%04X\n", packet->crc);
+    DECODE_LOG("Tail: 0x%02X\n", packet->tail);
+    DECODE_LOG("----------------------\n");
 }
-
 // ============================= Validation functions =======================
-bool packet_type_validate(uart_packet_t *pkt) {
+uart_decode_error_t packet_type_validate(uart_packet_t *pkt) {
     switch (pkt->type) {
         case PKT_TYPE_HELLO:
+            return UART_DECODE_TYPE_VALID;
             break;
 
         default:
-            DEBUGOUT("Packet type is invalid: 0x%04X\n", pkt->type);
-            return false;
+            DECODE_LOG("Packet type is invalid: 0x%04X\n", pkt->type);
+            return UART_DECODE_ERR_INVALID_TYPE;
     }
-    return true;
 }
 
-bool packet_length_validate (uart_packet_t *pkt){
+uart_decode_error_t packet_length_validate (uart_packet_t *pkt){
     if (pkt->length == 0 || pkt->length > UART_MAX_PACKET_LEN){
-        DEBUGOUT ("Packet length is invalid: %u \n", pkt->length);
-        return false;
+        DECODE_LOG ("Packet length is invalid: %u \n", pkt->length);
+        return UART_DECODE_ERR_INVALID_LENGTH;
     }
-    // DEBUGOUT("Packet LENGTH: %u bytes\n", pkt->length);
-    return true;
+    return UART_DECODE_LENGTH_VALID;
 }
 
 // ==================================== Decode FSM =====================================
@@ -79,13 +81,13 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
             if (byte == UART_HEADER) {
                 decoder->packet.sof = byte;
                 // Print header
-                DEBUGOUT ("Received HEADER: 0x%02X\n", byte);
+                DECODE_LOG ("Received HEADER: 0x%02X\n", byte);
 
                 // Reset CRC accumulator
                 decoder->calculated_crc = CRC16_CCITT_INIT;
 
                 decoder->state = READ_TYPE;
-                DEBUGOUT("State: WAIT_FOR_HEADER -> READ_TYPE\n");
+                DECODE_LOG("State: WAIT_FOR_HEADER -> READ_TYPE\n");
             }
             break;
         }
@@ -98,31 +100,32 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
             }
             // CRC include TYPE
             decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
-
             decoder->packet_temp_buffer_index++;
 
 
             // Print when both bytes of TYPE are read
             if (decoder->packet_temp_buffer_index == 2) {
-                DEBUGOUT("Received PACKET TYPE: 0x%04X\n", decoder->packet.type);
+                DECODE_LOG("Received PACKET TYPE: 0x%04X\n", decoder->packet.type);
 
                 // Validate type
                 if (!packet_type_validate(&decoder->packet)) {
-                    DEBUGOUT("Invalid type. Resetting to WAIT_FOR_HEADER\n");
+                    DECODE_LOG("Invalid type. Resetting to WAIT_FOR_HEADER\n");
                     decoder->state         = WAIT_FOR_HEADER;
                     decoder->packet_temp_buffer_index = 0;
                     break;
                 }
 
                 // Print individual bytes of TYPE
+                #if FSM_TYPE_DEBUG_ENABLE == 1
                 uint8_t type_lsb =  (uint8_t)(decoder->packet.type & 0xFF);
                 uint8_t type_msb =  (uint8_t)((decoder->packet.type >> 8) & 0xFF);
-                DEBUGOUT("Received TYPE bytes: LSB=0x%02X, MSB=0x%02X\n", type_lsb, type_msb);
+                DECODE_LOG("Received TYPE bytes: LSB=0x%02X, MSB=0x%02X\n", type_lsb, type_msb);
+                #endif
 
                 // State transition
                 decoder->state         = READ_LENGTH;
                 decoder->packet_temp_buffer_index = 0;
-                DEBUGOUT("State: READ_TYPE -> READ_LENGTH\n");
+                DECODE_LOG("State: READ_TYPE -> READ_LENGTH\n");
             }
             break;
         }
@@ -136,25 +139,24 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
 
             // CRC include TYPE
             decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
-
             decoder->packet_temp_buffer_index++;
 
             // 2bytes read → validate length
             if (decoder->packet_temp_buffer_index == 2) {
 
+                #if FSM_LENGTH_DEBUG_ENABLE == 1
                 uint8_t len_LSB = (uint8_t)(decoder->packet.length & 0xFF);
                 uint8_t len_MSB = (uint8_t)((decoder->packet.length >> 8) & 0xFF);
+                DECODE_LOG("Received LENGTH bytes: LSB=0x%02X, MSB=0x%02X\n", len_LSB, len_MSB);
+                #endif
 
-                DEBUGOUT("Packet LENGTH raw = %u (0x%04X)\n",  decoder->packet.length, decoder->packet.length);
-
-                DEBUGOUT("Received LENGTH bytes: LSB=0x%02X, MSB=0x%02X\n",
-                        len_LSB, len_MSB);
+                DECODE_LOG("Packet LENGTH raw = %u (0x%04X)\n",  decoder->packet.length, decoder->packet.length);
 
                 // Validate length
                 if (!packet_length_validate(&decoder->packet)) {
                     decoder->state = WAIT_FOR_HEADER;
                     decoder->bad_length_count++;
-                    DEBUGOUT("Invalid length. Resetting to WAIT_FOR_HEADER\n");
+                    DECODE_LOG("Invalid length. Resetting to WAIT_FOR_HEADER\n");
                     decoder->packet_temp_buffer_index = 0;
                     break;
                 }
@@ -162,7 +164,7 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                 // Transit to READ_PAYLOAD
                 decoder->state         = READ_PAYLOAD;
                 decoder->packet_temp_buffer_index = 0;
-                DEBUGOUT("State: READ_LENGTH -> READ_PAYLOAD\n");
+                DECODE_LOG("State: READ_LENGTH -> READ_PAYLOAD\n");
             }
 
             break;
@@ -177,13 +179,12 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                 // CRC include payload byte
                 decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
             } else {
-                DEBUGOUT("Payload buffer overflow. Resetting to WAIT_FOR_HEADER\n");
+                DECODE_LOG("Payload buffer overflow. Resetting to WAIT_FOR_HEADER\n");
                 decoder->state                       = WAIT_FOR_HEADER;
                 decoder->packet_temp_buffer_index    = 0;
                 decoder->packets_rejected++;
                 break;
             }
-
 
             // If received full payload
             if (decoder->packet_temp_buffer_index >= decoder->packet.length) {
@@ -195,17 +196,17 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                 #ifndef PRINT_PAYLOAD_ENABLE
                 // Print the full payload
                 for (uint16_t i = 0; i < decoder->packet.length; i++) {
-                    DEBUGOUT("Payload[%u]: 0x%02X\n", i, decoder->packet.payload[i]);
+                    DECODE_LOG("Payload[%u]: 0x%02X\n", i, decoder->packet.payload[i]);
                 }
                 #endif
 
-                DEBUGOUT("Full payload received (%u bytes)\n", decoder->packet.length);
+                DECODE_LOG("Full payload received (%u bytes)\n", decoder->packet.length);
 
 
                 // State transition to READ_ENDCODE
                 decoder->state                    = READ_ENDCODE;
                 decoder->packet_temp_buffer_index = 0;
-                DEBUGOUT("State: READ_PAYLOAD -> READ_ENDCODE\n");
+                DECODE_LOG("State: READ_PAYLOAD -> READ_ENDCODE\n");
             }
 
             break;
@@ -217,17 +218,17 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                 decoder->packet.endcode = byte;
 
                 // Print endcode
-                DEBUGOUT ("Received ENDCODE: 0x%02X\n", byte);
+                DECODE_LOG ("Received ENDCODE: 0x%02X\n", byte);
 
                 // CRC include TYPE
                 decoder->calculated_crc = crc16_ccitt_update(decoder->calculated_crc, byte);
 
                 decoder->state = READ_CRC;
                 decoder->packet_temp_buffer_index = 0;
-                DEBUGOUT("State: READ_ENDCODE -> READ_CRC\n");
+                DECODE_LOG("State: READ_ENDCODE -> READ_CRC\n");
             } else {
                 decoder->state = WAIT_FOR_HEADER;
-                DEBUGOUT("Invalid endcode. Resetting to WAIT_FOR_HEADER\n");
+                DECODE_LOG("Invalid endcode. Resetting to WAIT_FOR_HEADER\n");
             }
             break;
         }
@@ -244,18 +245,20 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
             // When received all 2 bytes of CRC
             if (decoder->packet_temp_buffer_index == UART_CRC_SIZE) {
 
-                DEBUGOUT("Received CRC:    0x%04X\n", decoder->received_crc);
-                DEBUGOUT("Calculated CRC:  0x%04X\n", decoder->calculated_crc);
+                #if FSM_CRC_DEBUG_ENABLE == 1
+                DECODE_LOG("Received CRC:    0x%04X\n", decoder->received_crc);
+                DECODE_LOG("Calculated CRC:  0x%04X\n", decoder->calculated_crc);
+                #endif
 
                 if (decoder->calculated_crc == decoder->received_crc) {
                     decoder->packet.crc  = decoder->received_crc;
                     decoder->state       = READ_TAIL;
-                    DEBUGOUT("CRC OK. State: READ_CRC -> READ_TAIL\n");
+                    DECODE_LOG("CRC OK. State: READ_CRC -> READ_TAIL\n");
                 } else {
                     decoder->state = WAIT_FOR_HEADER;
                     decoder->bad_checksum_count++;
                     decoder->packets_rejected++;
-                    DEBUGOUT("CRC mismatch. Resetting to WAIT_FOR_HEADER\n");
+                    DECODE_LOG("CRC mismatch. Resetting to WAIT_FOR_HEADER\n");
                 }
 
                 // Reset index for next state
@@ -271,14 +274,14 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                 decoder->packet.tail = byte;
                 decoder->total_packets_parsed++;
                 decoder->packets_accepted++;
-                DEBUGOUT("Packet accepted!\n");
+                DECODE_LOG("Packet accepted!\n");
                 uart_fsm_print_packet(&decoder->packet);
                 decoder->state = WAIT_FOR_HEADER; // Reset for next packet
                 decoder->packet_temp_buffer_index = 0;
-                DEBUGOUT("State: READ_TAIL -> WAIT_FOR_HEADER\n");
+                DECODE_LOG("State: READ_TAIL -> WAIT_FOR_HEADER\n");
             } else {
                 decoder->state = WAIT_FOR_HEADER;
-                DEBUGOUT("Invalid tail. Resetting to WAIT_FOR_HEADER\n");
+                DECODE_LOG("Invalid tail. Resetting to WAIT_FOR_HEADER\n");
             }
             break;
         }
@@ -286,7 +289,7 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
         default:{
 
             decoder->state = WAIT_FOR_HEADER;
-            DEBUGOUT("Unknown state. Resetting to WAIT_FOR_HEADER\n");
+            DECODE_LOG("Unknown state. Resetting to WAIT_FOR_HEADER\n");
             break;
         }
     }

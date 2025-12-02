@@ -1,31 +1,33 @@
 #ifndef SRC_INC_DECODE_H_
 #define SRC_INC_DECODE_H_
 
-// Payload types
-typedef enum {
-    TLV_TEST        = 0x00,
-    TLV_MAC_ADDRESS = 0x01,
-    TLV_UUID        = 0x02,
-    TLV_STATUS      = 0x03,
-    TLV_UUID_VALUE  = 0x04,
-    TLV_OTA_VALUE   = 0x05,
-    TLV_WIFI_CONFIG = 0x06,
-    TLV_HELLO       = 0x48,
-} tlv_type_t;
+#include <stdint.h>
+#include <stdbool.h>
+#include "rsi_debug.h"
 
+// Debug log macro - just use DEBUGOUT directly without prefix
+#define DECODE_LOG(format, ...) DEBUGOUT(format, ##__VA_ARGS__)
 
 // Packet types
 typedef enum {
-    PKT_TYPE_HELLO         = 0x0001,
-    PKT_TYPE_TEST          = 0x0101,
-    PKT_TYPE_OTA_REQUEST   = 0x0202,
-    PKT_TYPE_OTA_RESPONSE  = 0x0203,
-    PKT_TYPE_OTA_DATA      = 0x0204,
-    PKT_TYPE_UUID_REQUEST  = 0x0210,
-    PKT_TYPE_UUID_RESPONSE = 0x0211,
+    PKT_TYPE_HELLO                      = 0x0001,
+    PKT_TYPE_TEST                       = 0x0101,
+    PKT_TYPE_OTA_REQUEST                = 0x0202,
+    PKT_TYPE_OTA_RESPONSE               = 0x0203,
+    PKT_TYPE_OTA_DATA                   = 0x0204,
+    PKT_TYPE_UUID_REQUEST               = 0x0210,
+    PKT_TYPE_UUID_RESPONSE              = 0x0211,
+    PKT_TYPE_CONFIG_REQUEST             = 0x0301,
+    PKT_TYPE_CONFIG_RESPONSE            = 0x0302,
+    PKT_TYPE_WIFI_SCAN_REQUEST          = 0x0401,
+    PKT_TYPE_WIFI_SCAN_RESPONSE         = 0x0402,
+    PKT_TYPE_WIFI_CONNECT_REQUEST       = 0x0403,
+    PKT_TYPE_WIFI_CONNECT_RESPONSE      = 0x0404,
+    PKT_TYPE_WIFI_DISCONNECT_REQUEST    = 0x0405,
+    PKT_TYPE_WIFI_DISCONNECT_RESPONSE   = 0x0406,
+    PKT_TYPE_WIFI_STATUS_REQUEST        = 0x0407,
+    PKT_TYPE_WIFI_STATUS_RESPONSE       = 0x0408,
 } uart_packet_type_t;
-
-
 
 #define UART_HEADER             0xF0
 #define UART_ENDCODE            0xFF
@@ -42,7 +44,6 @@ typedef enum {
 #define UART_TAIL_SIZE          1
 #define CRC16_FIXED_LENGTH      (UART_TYPE_SIZE + UART_LENGTH_SIZE  + UART_ENCODE_SIZE)
 
-
 // UART Packet structure
 typedef struct {
     uint8_t            sof;                             // 1 byte
@@ -53,15 +54,6 @@ typedef struct {
     uint16_t           crc;                             // 2 bytes
     uint8_t            tail;                            // 1 byte
 } uart_packet_t;
-
-
-
-// UART Payload structure
-typedef struct {
-    uint8_t  *value;   // 4 byte, align 4
-    tlv_type_t type;   // 1 byte (uint8_t)
-    uint16_t length;   // 2 byte
-} payload_t;
 
 // FSM states for UART decoding
 typedef enum {
@@ -94,30 +86,37 @@ typedef struct {
     uint32_t bad_length_count;
 } uart_fsm_decoder_t;
 
-// Decode error codes
+// Decode error/success codes
 typedef enum {
-    UART_DECODE_PASSED             = 0,
-    UART_DECODE_ERR_INVALID_TYPE   = 1,
-    UART_DECODE_ERR_INVALID_LENGTH = 2,
-    UART_DECODE_ERR_INVALID_PAYLOAD= 3,
-    UART_DECODE_ERR_INVALID_CRC    = 4,
-    UART_DECODE_ERR_INVALID_ENDCODE= 5,
-    UART_DECODE_ERR_INVALID_TAIL   = 6,
-    UART_DECODE_FAILED             = 7,
+    /* ==================== SUCCESS CODES ==================== */
+    UART_DECODE_SUCCESS             = 0,    /* Packet decoded successfully */
+    UART_DECODE_INIT_SUCCESS        = 1,    /* Decoder initialized successfully */
+    UART_DECODE_CRC_VALID           = 2,    /* CRC is valid */
+    UART_DECODE_TYPE_VALID          = 3,    /* Packet type is valid */
+    UART_DECODE_LENGTH_VALID        = 4,    /* Packet length is valid */
+
+    /* ==================== ERROR CODES ==================== */
+    UART_DECODE_ERR_INVALID_TYPE    = 10,   /* Invalid packet type */
+    UART_DECODE_ERR_INVALID_LENGTH  = 11,   /* Invalid packet length */
+    UART_DECODE_ERR_INVALID_PAYLOAD = 12,   /* Invalid payload */
+    UART_DECODE_ERR_INVALID_CRC     = 13,   /* CRC mismatch */
+    UART_DECODE_ERR_INVALID_ENDCODE = 14,   /* Invalid endcode */
+    UART_DECODE_ERR_INVALID_TAIL    = 15,   /* Invalid tail */
+    UART_DECODE_ERR_BUFFER_OVERFLOW = 16,   /* Buffer overflow */
+    UART_DECODE_FAILED              = 17,   /* Generic decode failed */
+    UART_DECODE_INIT_FAILED         = 18,   /* Decoder initialization failed */
+    UART_DECODE_QUEUE_FULL          = 19,   /* Message queue is full */
+    UART_DECODE_QUEUE_PUT_FAILED    = 20,   /* Failed to put packet in queue */
 } uart_decode_error_t;
 
-
-
 // Decoder initialization
-bool fsm_decoder_init (uart_fsm_decoder_t *decoder);
+uart_decode_error_t fsm_decoder_init (uart_fsm_decoder_t *decoder);
 
 // Validation functions
-bool payload_validate(payload_t *payload);
-bool packet_type_validate (uart_packet_t *pkt);
-bool packet_length_validate (uart_packet_t *pkt);
+uart_decode_error_t packet_type_validate (uart_packet_t *pkt);
+uart_decode_error_t packet_length_validate (uart_packet_t *pkt);
 
 // Debug utilities
-void uart_print_stats(const uart_fsm_decoder_t *decoder);
 void uart_fsm_print_packet(const uart_packet_t *packet);
 
 // States machine for UART decoding
