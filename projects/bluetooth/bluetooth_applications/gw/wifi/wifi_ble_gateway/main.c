@@ -12,3 +12,6 @@ int main(void)
     app_process_action();
   }
 }
+
+// sl_main_start_task_should_continue()
+

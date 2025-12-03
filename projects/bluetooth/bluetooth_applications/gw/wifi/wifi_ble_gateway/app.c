@@ -1,26 +1,12 @@
 #include "uart_comm.h"
 #include "rsi_debug.h"
 #include "string.h"
+#include "decode.h"
+#include "decoder_test.h"
 
 // Macro to enable/disable mock test
 #define MOCK_TEST_UART 0
 
-void mock_test_uart(void);
-
-void app_init(void)
-{
-  uart_init();
-}
-
-/***************************************************************************/ /**
- * App ticking function.
- ******************************************************************************/
-void app_process_action(void)
-{
-#if MOCK_TEST_UART
-  mock_test_uart();
-#endif /*MOCK_TEST_UART*/
-}
 
 #if MOCK_TEST_UART
 void mock_test_uart(void)
@@ -40,3 +26,33 @@ void mock_test_uart(void)
   }
 }
 #endif /*MOCK_TEST_UART*/
+
+uart_fsm_decoder_t decoder;
+
+void app_init(void)
+{
+  uart_init();
+  fsm_decoder_init(&decoder);
+}
+
+/***************************************************************************/ /**
+ * App ticking function.
+ ******************************************************************************/
+void app_process_action(void)
+{
+  #if UART_DECODER_MOCK_TEST
+    static bool tests_ran = false;
+    if (!tests_ran) {
+      decoder_run_all_tests(&decoder);
+      tests_ran = true;
+    }
+  #endif /*UART_DECODER_MOCK_TEST*/
+
+  #if MOCK_TEST_UART
+    mock_test_uart();
+  #endif /*MOCK_TEST_UART*/
+}
+
+
+
+
