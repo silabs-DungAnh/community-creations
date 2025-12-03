@@ -4,30 +4,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "rsi_debug.h"
+#define DECODE_LOG_ENABLE 0
 
 // Debug log macro - just use DEBUGOUT directly without prefix
+#if DECODE_LOG_ENABLE == 0
+    #define DECODE_LOG(format, ...)
+#else
 #define DECODE_LOG(format, ...) DEBUGOUT(format, ##__VA_ARGS__)
+#endif
 
-// Packet types
-typedef enum {
-    PKT_TYPE_HELLO                      = 0x0001,
-    PKT_TYPE_TEST                       = 0x0101,
-    PKT_TYPE_OTA_REQUEST                = 0x0202,
-    PKT_TYPE_OTA_RESPONSE               = 0x0203,
-    PKT_TYPE_OTA_DATA                   = 0x0204,
-    PKT_TYPE_UUID_REQUEST               = 0x0210,
-    PKT_TYPE_UUID_RESPONSE              = 0x0211,
-    PKT_TYPE_CONFIG_REQUEST             = 0x0301,
-    PKT_TYPE_CONFIG_RESPONSE            = 0x0302,
-    PKT_TYPE_WIFI_SCAN_REQUEST          = 0x0401,
-    PKT_TYPE_WIFI_SCAN_RESPONSE         = 0x0402,
-    PKT_TYPE_WIFI_CONNECT_REQUEST       = 0x0403,
-    PKT_TYPE_WIFI_CONNECT_RESPONSE      = 0x0404,
-    PKT_TYPE_WIFI_DISCONNECT_REQUEST    = 0x0405,
-    PKT_TYPE_WIFI_DISCONNECT_RESPONSE   = 0x0406,
-    PKT_TYPE_WIFI_STATUS_REQUEST        = 0x0407,
-    PKT_TYPE_WIFI_STATUS_RESPONSE       = 0x0408,
-} uart_packet_type_t;
 
 #define UART_HEADER             0xF0
 #define UART_ENDCODE            0xFF

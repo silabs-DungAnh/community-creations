@@ -53,18 +53,6 @@ void uart_fsm_print_packet(const uart_packet_t *packet){
     DECODE_LOG("----------------------\n");
 }
 // ============================= Validation functions =======================
-uart_decode_error_t packet_type_validate(uart_packet_t *pkt) {
-    switch (pkt->type) {
-        case PKT_TYPE_HELLO:
-            return UART_DECODE_TYPE_VALID;
-            break;
-
-        default:
-            DECODE_LOG("Packet type is invalid: 0x%04X\n", pkt->type);
-            return UART_DECODE_ERR_INVALID_TYPE;
-    }
-}
-
 uart_decode_error_t packet_length_validate (uart_packet_t *pkt){
     if (pkt->length == 0 || pkt->length > UART_MAX_PACKET_LEN){
         DECODE_LOG ("Packet length is invalid: %u \n", pkt->length);
@@ -107,13 +95,6 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
             if (decoder->packet_temp_buffer_index == 2) {
                 DECODE_LOG("Received PACKET TYPE: 0x%04X\n", decoder->packet.type);
 
-                // Validate type
-                if (!packet_type_validate(&decoder->packet)) {
-                    DECODE_LOG("Invalid type. Resetting to WAIT_FOR_HEADER\n");
-                    decoder->state         = WAIT_FOR_HEADER;
-                    decoder->packet_temp_buffer_index = 0;
-                    break;
-                }
 
                 // Print individual bytes of TYPE
                 #if FSM_TYPE_DEBUG_ENABLE == 1
