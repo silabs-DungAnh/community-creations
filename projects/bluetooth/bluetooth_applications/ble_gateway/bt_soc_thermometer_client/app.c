@@ -1,0 +1,1081 @@
+/***************************************************************************//**
+ * @file
+ * @brief Core application logic
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
+ *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, subject to the following restrictions:
+ *
+ * 1. The origin of this software must not be misrepresented; you must not
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
+ * 2. Altered source versions must be plainly marked as such, and must not be
+ *    misrepresented as being the original software.
+ * 3. This notice may not be removed or altered from any source distribution.
+ *
+ ******************************************************************************/
+#include <stdbool.h>
+#include <math.h>
+#include <string.h>
+#include "app_log.h"
+#include "app_assert.h"
+#include "sl_bluetooth.h"
+#include "sl_component_catalog.h"
+#ifdef SL_CATALOG_CLI_PRESENT
+#include "sl_cli.h"
+#endif // SL_CATALOG_CLI_PRESENT
+#include "app.h"
+#include "sl_main_init.h"
+#include "ota_client.h"
+#include "uuid_number.h"
+
+// connection parameters
+#define CONN_INTERVAL_MIN             80   //100ms
+#define CONN_INTERVAL_MAX             80   //100ms
+#define CONN_RESPONDER_LATENCY        0    //no latency
+#define CONN_TIMEOUT                  100  //1000ms
+#define CONN_MIN_CE_LENGTH            0
+#define CONN_MAX_CE_LENGTH            0xffff
+
+#define TEMP_INVALID                  ((float)-1000)
+#define UNIT_INVALID                  ('?')
+#define UNIT_CELSIUS                  ('C')
+#define UNIT_FAHRENHEIT               ('F')
+#define CONNECTION_HANDLE_INVALID     ((uint8_t)0xFFu)
+#define SERVICE_HANDLE_INVALID        ((uint32_t)0xFFFFFFFFu)
+#define CHARACTERISTIC_HANDLE_INVALID ((uint16_t)0xFFFFu)
+#define TABLE_INDEX_INVALID           ((uint8_t)0xFFu)
+#define TX_POWER_INVALID              ((uint8_t)0x7C)
+#define TX_POWER_CONTROL_ACTIVE       ((uint8_t)0x00)
+#define TX_POWER_CONTROL_INACTIVE     ((uint8_t)0x01)
+#define PRINT_TX_POWER_DEFAULT        (false)
+#define MEASUREMENT_INTERVAL_INVALID  ((uint16_t)0xFFFF)
+#define TEMP_TYPE_INVALID            ((uint8_t)0xFF)
+
+//invalid data for generic access service
+#define DEVICE_NAME_INVALID "Invalid Device Name"
+#define APPEARANCE_INVALID ((uint16_t)0xFFFF)
+//invalid data for device information service
+#define MANUFACTURER_NAME_INVALID "Invalid Manufacturer Name"
+#define MODEL_NUMBER_INVALID "Invalid Model Number"
+#define HARDWARE_REVISION_INVALID "Invalid Hardware Revision"
+#define FIRMWARE_REVISION_INVALID "Invalid Firmware Revision"
+// invalid data for ota service
+#define APP_VERSION_INVALID ((uint32_t)0xFFFFFFFFu)
+#define OTA_DATA_PROPERTIES_INVALID ((uint8_t)0xFF)
+
+// seconds
+#if SL_BT_CONFIG_MAX_CONNECTIONS < 1
+  #error At least 1 connection has to be enabled!
+#endif
+
+// Macro to translate the Flags to Celsius (C) or Fahrenheit (F). Flags is the first byte of the
+// Temperature Measurement characteristic value according to the Bluetooth SIG
+#define translate_flags_to_temperature_unit(flags) (((flags) & 1) ? UNIT_FAHRENHEIT : UNIT_CELSIUS)
+
+typedef enum {
+  scanning,
+  opening,
+  discover_thermo_services,
+  discover_ota_services,
+  discover_dev_info_services,
+  discover_thermo_char,
+  discover_ota_char,
+  discover_dev_info_char,
+  enable_indication,
+  enable_notification,
+  running
+} conn_state_t;
+
+typedef struct {
+    uint32_t OTA_handle;
+    uint32_t Generic_access_handle;
+    uint32_t Device_information_handle;
+    uint32_t Heart_rate_handle;
+    uint32_t Health_thermometer_handle;
+} service_handles_t;
+
+// ---- Characteristic handles
+typedef struct {
+    uint32_t OTA_control_handle;
+    uint32_t OTA_data_handle;
+    uint32_t Device_name_handle;
+    uint32_t Appearance_handle;
+    uint32_t Manufacturer_name_handle;
+    uint32_t Model_number_handle;
+    uint32_t Hardware_revision_handle;
+    uint32_t Firmware_revision_handle;
+    uint32_t System_id_handle;
+    uint32_t Temperature_measurement_handle;
+    uint32_t Temperature_type_handle;
+    uint32_t Measurement_interval_handle;
+    uint32_t Intermediate_temperature_measurement_handle;
+} characteristic_handles_t;
+
+// ---- Data values
+#define DEVNAME_MAX_LEN        12
+#define MANUFACTURER_LEN       13
+#define MODELNUM_MAX_LEN       10
+#define HWREV_MAX_LEN          5
+#define FWREV_MAX_LEN          20
+#define SYSTEMID_LEN           8
+
+typedef struct {
+    char     device_name[DEVNAME_MAX_LEN];
+    uint16_t appearance;
+
+    char     manufacturer_name[MANUFACTURER_LEN];
+    char     model_number[MODELNUM_MAX_LEN];
+    char     hardware_revision[HWREV_MAX_LEN];
+    char     firmware_revision[FWREV_MAX_LEN];
+    uint8_t  system_id[SYSTEMID_LEN];
+
+    uint8_t  ota_data_properties;
+
+    float    temp;
+    uint8_t  temp_type;
+    uint16_t measurement_interval;
+    float    intermediate_temp;
+    char unit;
+} data_t;
+
+// ---- Connection properties
+typedef struct {
+    uint8_t  connection_handle;
+    int8_t   rssi;
+    bool     power_control_active;
+    int8_t   tx_power;
+    int8_t   remote_tx_power;
+    uint16_t server_address;
+
+    service_handles_t        service_handle;
+    characteristic_handles_t characteristic_handle;
+    data_t                   data;
+} conn_properties_t;
+
+//struct for IEEE-11073 float value
+typedef struct {
+  uint8_t mantissa_l;
+  uint8_t mantissa_m;
+  int8_t mantissa_h;
+  int8_t exponent;
+} IEEE_11073_float;
+
+// Array for holding properties of multiple (parallel) connections
+static conn_properties_t conn_properties[SL_BT_CONFIG_MAX_CONNECTIONS];
+// Counter of active connections
+static uint8_t active_connections_num;
+// State of the connection under establishment
+static conn_state_t conn_state;
+//procedure event queue
+
+//connection for OTA
+static uint8_t ble_connection;
+ota_state_t ota_state;
+static const uint8_t MAC_test[6] = { 0x4C, 0xA6, 0x45, 0xB1, 0x5C, 0x6C};
+uint16_t control_char;
+uint16_t data_char;
+uint16_t app_ver_char;
+// Print out tx power value
+static bool print_tx_power = PRINT_TX_POWER_DEFAULT;
+
+static void init_properties(void);
+static uint8_t find_service_in_advertisement(uint8_t *data, uint8_t len);
+static uint8_t check_MAC_address(uint8_t *addr, uint8_t addr_type);
+static uint8_t find_index_by_connection_handle(uint8_t connection);
+static void add_connection(uint8_t connection, uint16_t address);
+// Remove a connection from the connection_properties array
+static void remove_connection(uint8_t connection);
+static float translate_IEEE_11073_temperature_to_float(IEEE_11073_float const *IEEE_11073_value);
+static bd_addr *read_and_cache_bluetooth_address(uint8_t *address_type_out);
+static void print_bluetooth_address(void);
+// Print RSSI and temperature values
+static void print_values(void);
+//take temperature characteristic handle
+
+//** * Application Init.*****************************************************************************/
+void app_init(void)
+{
+  // Initialize connection properties
+  init_properties();
+  app_log_info("soc_thermometer_client initialized." APP_LOG_NL);
+  /////////////////////////////////////////////////////////////////////////////
+  // Put your additional application init code here!                         //
+  // This is called once during start-up.                                    //
+  /////////////////////////////////////////////////////////////////////////////
+}
+
+/**************************************************************************//**
+ * Application Process Action.
+ *****************************************************************************/
+void app_process_action(void)
+{
+  if (app_is_process_required()) {
+    /////////////////////////////////////////////////////////////////////////////
+    // Put your additional application code here!                              //
+    // This is will run each time app_proceed() is called.                     //
+    // Do not call blocking functions from here!                               //
+    /////////////////////////////////////////////////////////////////////////////
+  }
+}
+
+/**************************************************************************//**
+ * Bluetooth stack event handler.
+ * This overrides the default weak implementation.
+ *
+ * @param[in] evt Event coming from the Bluetooth stack.
+ *****************************************************************************/
+void sl_bt_on_event(sl_bt_msg_t* evt)
+{
+  sl_status_t sc;
+  uint8_t *char_value;
+  uint16_t addr_value;
+  uint8_t table_index;
+  int8_t rssi;
+
+  // Handle stack events
+  switch (SL_BT_MSG_ID(evt->header)) {
+    // -------------------------------
+    // This event indicates the device has started and the radio is ready.
+    // Do not call any stack command before receiving this boot event!
+    case sl_bt_evt_system_boot_id:
+      // Print boot message.
+      app_log_info("Bluetooth stack booted: v%d.%d.%d+%08lx" APP_LOG_NL,
+                   evt->data.evt_system_boot.major,
+                   evt->data.evt_system_boot.minor,
+                   evt->data.evt_system_boot.patch,
+                   evt->data.evt_system_boot.hash);
+      // Print bluetooth address.
+      print_bluetooth_address();
+
+      // Set the default connection parameters for subsequent connections
+      sc = sl_bt_connection_set_default_parameters(CONN_INTERVAL_MIN,
+                                                   CONN_INTERVAL_MAX,
+                                                   CONN_RESPONDER_LATENCY,
+                                                   CONN_TIMEOUT,
+                                                   CONN_MIN_CE_LENGTH,
+                                                   CONN_MAX_CE_LENGTH);
+      app_assert_status(sc);
+      // Start scanning - looking for thermometer devices
+      sc = sl_bt_scanner_start(sl_bt_scanner_scan_phy_1m,
+                               sl_bt_scanner_discover_generic);
+      app_assert_status_f(sc, "Failed to start discovery #1" APP_LOG_NL);
+      conn_state = scanning;
+      break;
+
+    // -------------------------------
+    // This event is generated when an advertisement packet or a scan response
+    // is received from a responder
+    case sl_bt_evt_scanner_legacy_advertisement_report_id:
+      // Parse advertisement packets
+      if (evt->data.evt_scanner_legacy_advertisement_report.event_flags
+          == (SL_BT_SCANNER_EVENT_FLAG_CONNECTABLE | SL_BT_SCANNER_EVENT_FLAG_SCANNABLE)) {
+         if(check_MAC_address(&(evt->data.evt_scanner_legacy_advertisement_report.address.addr[0]),
+                              evt->data.evt_scanner_legacy_advertisement_report.address_type))
+           {
+             printf("\n");
+             app_log("Ket noi dc he he" APP_LOG_NL);
+             app_log("Found device: %02X:%02X:%02X:%02X:%02X:%02X" APP_LOG_NL,
+                     evt->data.evt_scanner_legacy_advertisement_report.address.addr[5],
+                     evt->data.evt_scanner_legacy_advertisement_report.address.addr[4],
+                     evt->data.evt_scanner_legacy_advertisement_report.address.addr[3],
+                     evt->data.evt_scanner_legacy_advertisement_report.address.addr[2],
+                     evt->data.evt_scanner_legacy_advertisement_report.address.addr[1],
+                     evt->data.evt_scanner_legacy_advertisement_report.address.addr[0]);
+             printf("\n");
+        // If a thermometer advertisement is found...
+        if (find_service_in_advertisement(&(evt->data.evt_scanner_legacy_advertisement_report.data.data[0]),
+                                          evt->data.evt_scanner_legacy_advertisement_report.data.len) != 0) {
+          // then stop scanning for a while
+          sc = sl_bt_scanner_stop();
+          app_assert_status(sc);
+          // and connect to that device
+          if (active_connections_num < SL_BT_CONFIG_MAX_CONNECTIONS) {
+            sc = sl_bt_connection_open(evt->data.evt_scanner_legacy_advertisement_report.address,
+                                       evt->data.evt_scanner_legacy_advertisement_report.address_type,
+                                       sl_bt_gap_phy_1m,
+                                       NULL);
+            app_assert_status(sc);
+            conn_state = opening;
+          }
+        }
+      }
+    }
+      break;
+
+    // -------------------------------
+    // This event is generated when a new connection is established
+    case sl_bt_evt_connection_opened_id:
+      // Discover Health Thermometer service on the responder device
+      sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_connection_opened.connection,
+                                                        sizeof(uuid_thermo_service),
+                                                        (const uint8_t*)uuid_thermo_service);
+
+      if (sc == SL_STATUS_INVALID_HANDLE) {
+        // Failed to open connection, restart scanning
+        app_log_warning("Primary service discovery failed with invalid handle, dropping client" APP_LOG_NL);
+        sc = sl_bt_scanner_start(sl_bt_gap_phy_1m, sl_bt_scanner_discover_generic);
+        app_assert_status(sc);
+        conn_state = scanning;
+        break;
+      } else {
+        app_assert_status(sc);
+      }
+      // Get last two bytes of sender address
+      addr_value = (uint16_t)(evt->data.evt_connection_opened.address.addr[1] << 8) + evt->data.evt_connection_opened.address.addr[0];
+      // Add connection to the connection_properties array
+      add_connection(evt->data.evt_connection_opened.connection, addr_value);
+
+      // Set remote connection power reporting - needed for Power Control
+      sc = sl_bt_connection_set_remote_power_reporting(
+        evt->data.evt_connection_opened.connection,
+        sl_bt_connection_power_reporting_enable);
+      app_assert_status(sc);
+      conn_state = discover_thermo_services;
+      
+      break;
+
+    // -------------------------------
+    // This event is generated when a new service is discovered
+    case sl_bt_evt_gatt_service_id:
+      table_index = find_index_by_connection_handle(evt->data.evt_gatt_service.connection);
+      if (table_index != TABLE_INDEX_INVALID) {
+        // Save service handle for future reference
+        if(evt->data.evt_gatt_service.uuid.data == uuid_thermo_service)
+          conn_properties[table_index].service_handle.Health_thermometer_handle= evt->data.evt_gatt_service.service;
+        else if(evt->data.evt_gatt_service.uuid.data == uuid_ota_service)
+          conn_properties[table_index].service_handle.OTA_handle= evt->data.evt_gatt_service.service;
+        else if(evt->data.evt_gatt_service.uuid.data == uuid_device_info_service)
+          conn_properties[table_index].service_handle.Device_information_handle= evt->data.evt_gatt_service.service;
+      }
+      
+      break;
+
+    // -------------------------------
+    // This event is generated when a new characteristic is discovered
+    case sl_bt_evt_gatt_characteristic_id:
+      table_index = find_index_by_connection_handle(evt->data.evt_gatt_characteristic.connection);
+      if (table_index != TABLE_INDEX_INVALID) {
+        //save characteristic handle of thermometer service
+        if(evt->data.evt_gatt_characteristic.uuid.data == uuid_temp && 
+                conn_properties[table_index].characteristic_handle.Temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Temperature_measurement_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_temp_type &&
+                conn_properties[table_index].characteristic_handle.Temperature_type_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Temperature_type_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_measurement_interval &&
+                conn_properties[table_index].characteristic_handle.Measurement_interval_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Measurement_interval_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_intermediate_temp &&
+                conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle= evt->data.evt_gatt_characteristic.characteristic;
+        
+         //save characteristic handle of ota service
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_ota_control &&
+                conn_properties[table_index].characteristic_handle.OTA_control_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.OTA_control_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_ota_data &&
+                conn_properties[table_index].characteristic_handle.OTA_data_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.OTA_data_handle= evt->data.evt_gatt_characteristic.characteristic; 
+         
+          //save characteris(tic handle of device information service
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_manufacturer_name &&
+                conn_properties[table_index].characteristic_handle.Manufacturer_name_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Manufacturer_name_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_model_number &&
+                conn_properties[table_index].characteristic_handle.Model_number_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Model_number_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_hardware_revision &&
+                conn_properties[table_index].characteristic_handle.Hardware_revision_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Hardware_revision_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_firmware_revision &&
+                conn_properties[table_index].characteristic_handle.Firmware_revision_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Firmware_revision_handle= evt->data.evt_gatt_characteristic.characteristic;
+        else if(evt->data.evt_gatt_characteristic.uuid.data == uuid_system_id &&
+                conn_properties[table_index].characteristic_handle.Device_name_handle != CHARACTERISTIC_HANDLE_INVALID)
+          conn_properties[table_index].characteristic_handle.Device_name_handle= evt->data.evt_gatt_characteristic.characteristic;
+      }
+      break;
+
+    // -------------------------------
+    // This event is generated for various procedure completions, e.g. when a
+    // write procedure is completed, or service discovery is completed
+    case sl_bt_evt_gatt_procedure_completed_id:
+        table_index = find_index_by_connection_handle(evt->data.evt_gatt_procedure_completed.connection);
+        if (table_index == TABLE_INDEX_INVALID) {
+          break;
+        }
+        //for OTA 
+          ble_connection = ota_client_get_connection();
+        if(ble_connection == evt->data.evt_gatt_procedure_completed.connection)
+          {
+            ota_state = ota_client_get_state();
+          switch (ota_state)
+            {
+            case OTA_READ_APPLICATION_VERSION:
+              ota_change_state(OTA_READ_OTA_DATA_PROPERTIES);
+              break;
+            case OTA_READ_OTA_DATA_PROPERTIES:
+              ota_change_state(OTA_BEGIN);
+              break;
+            case OTA_BEGIN:
+              app_log("OK\n");
+              table_index = find_index_by_connection_handle(ble_connection);
+              if ((conn_properties[table_index].data.ota_data_properties & 0x0C) == 0) {
+                ERROR_EXIT("Wrong supported OTA Data properties\r\n");
+              } else {
+                if (conn_properties[table_index].data.ota_data_properties & 0x04) {     //Write without response is supported and forced
+                  app_log("OTA DFU - write without response \n");
+                  ota_change_state(OTA_UPLOAD_WITHOUT_RSP);
+                } else {
+                  app_log("OTA DFU - write with response \n");
+                  ota_change_state(OTA_UPLOAD_WITH_RSP);
+                }
+              }
+              break;
+            
+            case OTA_UPLOAD_WITHOUT_RSP:
+              if (evt->data.evt_gatt_procedure_completed.result) {
+                ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+              }
+              send_dfu_block();
+              break;
+            case OTA_UPLOAD_WITH_RSP:
+              if (evt->data.evt_gatt_procedure_completed.result) {
+                ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+              }
+              send_dfu_packet_with_confirmation();
+              break; 
+            case OTA_END:
+              if (evt->data.evt_gatt_procedure_completed.result) {
+                ERROR_EXIT("procedure failed:0x%x\r\n", evt->data.evt_gatt_procedure_completed.result);
+              }
+            app_log("OK\n");
+            ble_connection == CONNECTION_HANDLE_INVALID;
+            ota_state = OTA_IDLE;
+            ota_change_state(OTA_IDLE);
+            //reset all characteristic handle
+            uint16_t control_char = CHARACTERISTIC_HANDLE_INVALID;
+            uint16_t data_char = CHARACTERISTIC_HANDLE_INVALID;
+            uint16_t app_ver_char = CHARACTERISTIC_HANDLE_INVALID;
+            init_ota_client(ble_connection, control_char, data_char, app_ver_char);
+              break;  
+            default:
+              break;
+            }
+          }
+        //end of OTA procedure
+        
+        //for connecting multiple devices
+        switch (conn_state) {
+          case discover_thermo_services:
+            // Discover OTA service on the responder device
+            sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_gatt_procedure_completed.connection,
+                                                              sizeof(uuid_ota_service),
+                                                              (const uint8_t*)uuid_ota_service);
+            app_assert_status(sc);
+            conn_state = discover_ota_services;
+            break;
+
+          case discover_ota_services:
+            // Discover Device Information service on the responder device
+            sc = sl_bt_gatt_discover_primary_services_by_uuid(evt->data.evt_gatt_procedure_completed.connection,
+                                                              sizeof(uuid_device_info_service),
+                                                              (const uint8_t*)uuid_device_info_service);
+            app_assert_status(sc);
+            conn_state = discover_dev_info_services;
+            break;
+
+          case discover_dev_info_services:
+            // Discover characteristics of Health Thermometer service
+            sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
+                                                    conn_properties[table_index].service_handle.Health_thermometer_handle);
+            app_assert_status(sc);
+            conn_state = discover_thermo_char;
+            break;
+
+          case discover_thermo_char:
+            // Discover characteristics of OTA service          
+            sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
+                                                    conn_properties[table_index].service_handle.OTA_handle);
+            app_assert_status(sc);
+            conn_state = discover_ota_char;
+            break;
+
+          case discover_ota_char:
+            // Discover characteristics of Device Information service
+            sc = sl_bt_gatt_discover_characteristics(evt->data.evt_gatt_procedure_completed.connection,
+                                                    conn_properties[table_index].service_handle.Device_information_handle);
+            app_assert_status(sc);
+            // Enable indication of Temperature Measurement characteristic
+            conn_state = discover_dev_info_char;
+            break;
+
+          case discover_dev_info_char:
+            if (conn_properties[table_index].characteristic_handle.Temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
+              sc = sl_bt_gatt_set_characteristic_notification(evt->data.evt_gatt_procedure_completed.connection,
+                                                            conn_properties[table_index].characteristic_handle.Temperature_measurement_handle,
+                                                            sl_bt_gatt_indication);
+              app_assert_status(sc);
+            }
+            conn_state = enable_indication;
+            break;
+          
+
+          case enable_indication:
+            if (conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle != CHARACTERISTIC_HANDLE_INVALID) {
+              sc = sl_bt_gatt_set_characteristic_notification(evt->data.evt_gatt_procedure_completed.connection,
+                                                            conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle,
+                                                            sl_bt_gatt_notification);
+              app_assert_status(sc);
+              conn_state = enable_notification;
+              break;
+            }
+          if (conn_state == enable_notification) {
+          // and we can connect to more devices
+          if (active_connections_num < SL_BT_CONFIG_MAX_CONNECTIONS) {
+            // start scanning again to find new devices
+            sc = sl_bt_scanner_start(sl_bt_scanner_scan_phy_1m,
+                                    sl_bt_scanner_discover_generic);
+            app_assert_status_f(sc, "Failed to start discovery #2" APP_LOG_NL);
+            conn_state = scanning;
+          } else {
+            conn_state = running;
+          }
+          break;
+        }
+      }
+        break;
+
+    // -------------------------------
+    // This event is generated when a connection is dropped
+    case sl_bt_evt_connection_closed_id:
+      // remove connection from active connections
+      remove_connection(evt->data.evt_connection_closed.connection);
+      if (conn_state != scanning) {
+        // start scanning again to find new devices
+        sc = sl_bt_scanner_start(sl_bt_scanner_scan_phy_1m,
+                                 sl_bt_scanner_discover_generic);
+        app_assert_status_f(sc, "Failed to start discovery #3" APP_LOG_NL);
+        conn_state = scanning;
+      }
+      break;
+
+    // -------------------------------
+    // This event is generated when a characteristic value was received e.g. an indication
+    case sl_bt_evt_gatt_characteristic_value_id:
+      table_index = find_index_by_connection_handle(evt->data.evt_gatt_characteristic_value.connection);
+      if (table_index == TABLE_INDEX_INVALID) {
+        break;
+      }
+      // Check if the characteristic is Temperature Measurement
+      if (evt->data.evt_gatt_characteristic_value.characteristic
+              == conn_properties[table_index].characteristic_handle.Temperature_measurement_handle) {
+            // The first byte of the characteristic value contains flags
+            conn_properties[table_index].data.unit = translate_flags_to_temperature_unit(evt->data.evt_gatt_characteristic_value.value.data[0]);
+            // Next 4 bytes contain temperature value in IEEE-11073 float format
+            if (evt->data.evt_gatt_characteristic_value.value.len >= 5) {
+              conn_properties[table_index].data.temp = translate_IEEE_11073_temperature_to_float(
+                (IEEE_11073_float*)&(evt->data.evt_gatt_characteristic_value.value.data[0]));
+            }
+            else {
+            app_log_warning("Characteristic value too short: %d" APP_LOG_NL,
+                            evt->data.evt_gatt_characteristic_value.value.len);
+            }
+          // Send confirmation for the indication
+            sc = sl_bt_gatt_send_characteristic_confirmation(evt->data.evt_gatt_characteristic_value.connection);
+            app_assert_status(sc);
+            // Trigger RSSI measurement on the connection
+            rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+            sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+            conn_properties[table_index].rssi = rssi;
+            print_values();
+      }
+      // Check if the characteristic is Intermediate Temperature Measurement
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+               == conn_properties[table_index].characteristic_handle.Intermediate_temperature_measurement_handle) {
+            // The first byte of the characteristic value contains flags
+            conn_properties[table_index].data.unit = translate_flags_to_temperature_unit(evt->data.evt_gatt_characteristic_value.value.data[0]);
+            // Next 4 bytes contain temperature value in IEEE-11073 float format
+            if (evt->data.evt_gatt_characteristic_value.value.len >= 5) {
+              conn_properties[table_index].data.intermediate_temp = translate_IEEE_11073_temperature_to_float(
+                (IEEE_11073_float*)&(evt->data.evt_gatt_characteristic_value.value.data[1]));
+            }
+            else {
+            app_log_warning("Characteristic value too short: %d" APP_LOG_NL,
+                            evt->data.evt_gatt_characteristic_value.value.len);
+            }
+            // Trigger RSSI measurement on the connection
+            rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+            sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+            conn_properties[table_index].rssi = rssi;
+            print_values();
+            }
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+               == conn_properties[table_index].characteristic_handle.Temperature_type_handle) {
+            // The first byte of the characteristic value contains temperature type
+            if (evt->data.evt_gatt_characteristic_value.value.len >= 1) {
+              conn_properties[table_index].data.temp_type = evt->data.evt_gatt_characteristic_value.value.data[1];
+            }
+            else {
+            app_log_warning("Characteristic value too short: %d" APP_LOG_NL,
+                            evt->data.evt_gatt_characteristic_value.value.len);
+            }
+            // Trigger RSSI measurement on the connection
+            rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+            sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+            conn_properties[table_index].rssi = rssi;
+            print_values();
+            }
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+               == conn_properties[table_index].characteristic_handle.Measurement_interval_handle)
+            { 
+            if(evt->data.evt_gatt_characteristic_value.value.len >= 2) {
+              conn_properties[table_index].data.measurement_interval = 
+                (uint16_t)(evt->data.evt_gatt_characteristic_value.value.data[1] << 8) + evt->data.evt_gatt_characteristic_value.value.data[0];
+            }
+            else {
+            rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+            sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+            conn_properties[table_index].rssi = rssi;
+            print_values();
+          }
+          }
+
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Manufacturer_name_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < MANUFACTURER_LEN) {
+              memcpy(conn_properties[table_index].data.manufacturer_name,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.manufacturer_name[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          }
+
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Model_number_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < MODELNUM_MAX_LEN) {
+              memcpy(conn_properties[table_index].data.model_number,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.model_number[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          } 
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Hardware_revision_handle)  
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < HWREV_MAX_LEN) {
+              memcpy(conn_properties[table_index].data.hardware_revision,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.hardware_revision[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          } 
+
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.Firmware_revision_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len < FWREV_MAX_LEN) {
+              memcpy(conn_properties[table_index].data.firmware_revision,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+              conn_properties[table_index].data.firmware_revision[evt->data.evt_gatt_characteristic_value.value.len] = 0;
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values(); 
+          }
+          }
+      else if (evt->data.evt_gatt_characteristic_value.characteristic
+             == conn_properties[table_index].characteristic_handle.System_id_handle)
+          {
+            if(evt->data.evt_gatt_characteristic_value.value.len == SYSTEMID_LEN) {
+              memcpy(conn_properties[table_index].data.system_id,
+                    &(evt->data.evt_gatt_characteristic_value.value.data[0]),
+                    evt->data.evt_gatt_characteristic_value.value.len);
+            } else {
+                  rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+                  sc = sl_bt_connection_get_median_rssi(evt->data.evt_gatt_characteristic_value.connection, &rssi);
+                  conn_properties[table_index].rssi = rssi;
+                  print_values();
+          }
+          }
+      
+        break;
+            
+    // -------------------------------
+    // TX Power is updated
+    case sl_bt_evt_connection_tx_power_id:
+
+      table_index = find_index_by_connection_handle(
+        evt->data.evt_connection_tx_power.connection);
+
+      if (table_index != TABLE_INDEX_INVALID) {
+        conn_properties[table_index].tx_power =
+          evt->data.evt_connection_tx_power.power_level;
+      }
+
+      // TX Power reporting is enabled on the other side.
+      conn_properties[table_index].power_control_active =
+        TX_POWER_CONTROL_ACTIVE;
+      break;
+
+    // -------------------------------
+    // Remote TX Power is updated
+    case sl_bt_evt_connection_remote_tx_power_id:
+      table_index = find_index_by_connection_handle(
+        evt->data.evt_connection_remote_tx_power.connection);
+
+      if (table_index != TABLE_INDEX_INVALID) {
+        conn_properties[table_index].remote_tx_power =
+          evt->data.evt_connection_remote_tx_power.power_level;
+      }
+      break;
+
+    default:
+      app_log_debug("BLE event: 0x%lx" APP_LOG_NL,
+                    (unsigned long)SL_BT_MSG_ID(evt->header));
+      break;
+
+  }
+}
+
+
+// Init connection properties
+static void init_properties(void)
+{
+  uint8_t i;
+  active_connections_num = 0;
+  control_char = CHARACTERISTIC_HANDLE_INVALID;
+  data_char = CHARACTERISTIC_HANDLE_INVALID;
+  app_ver_char = CHARACTERISTIC_HANDLE_INVALID; 
+  ota_state = OTA_IDLE;
+  ble_connection = CONNECTION_HANDLE_INVALID; 
+  for (i = 0; i < SL_BT_CONFIG_MAX_CONNECTIONS; i++) {
+      conn_properties[i].connection_handle = CONNECTION_HANDLE_INVALID;
+      conn_properties[i].rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+      conn_properties[i].power_control_active = TX_POWER_CONTROL_INACTIVE;
+      conn_properties[i].tx_power = TX_POWER_INVALID;
+      conn_properties[i].remote_tx_power = TX_POWER_INVALID;
+      conn_properties[i].server_address = 0;
+
+      conn_properties[i].service_handle.OTA_handle = SERVICE_HANDLE_INVALID;
+      conn_properties[i].service_handle.Generic_access_handle = SERVICE_HANDLE_INVALID;
+      conn_properties[i].service_handle.Device_information_handle = SERVICE_HANDLE_INVALID;
+      conn_properties[i].service_handle.Heart_rate_handle = SERVICE_HANDLE_INVALID;
+      conn_properties[i].service_handle.Health_thermometer_handle = SERVICE_HANDLE_INVALID;
+
+      conn_properties[i].characteristic_handle.OTA_control_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.OTA_data_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Device_name_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Appearance_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Manufacturer_name_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Model_number_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Hardware_revision_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Temperature_measurement_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Temperature_type_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Measurement_interval_handle = CHARACTERISTIC_HANDLE_INVALID;
+      conn_properties[i].characteristic_handle.Intermediate_temperature_measurement_handle = CHARACTERISTIC_HANDLE_INVALID;
+
+      conn_properties[i].data.temp = TEMP_INVALID;
+      conn_properties[i].data.temp_type = TEMP_TYPE_INVALID;
+      conn_properties[i].data.measurement_interval = MEASUREMENT_INTERVAL_INVALID;
+      conn_properties[i].data.intermediate_temp = TEMP_INVALID;
+      conn_properties[i].data.unit = UNIT_INVALID;
+  }
+}
+
+// Parse advertisements looking for advertised Health Thermometer service
+static uint8_t find_service_in_advertisement(uint8_t *data, uint8_t len)
+{
+  uint8_t ad_field_length;
+  uint8_t ad_field_type;
+  uint8_t i = 0;
+  // Parse advertisement packet
+  while (i < len) {
+    ad_field_length = data[i];
+    ad_field_type = data[i + 1];
+    // Partial ($02) or complete ($03) list of 16-bit UUIDs
+    if (ad_field_type == 0x02 || ad_field_type == 0x03) {
+      // compare UUID to Health Thermometer service UUID
+      if (memcmp(&data[i + 2], uuid_thermo_service, 2) == 0) {
+        return 1;
+      }
+    }
+    // advance to the next AD struct
+    i = i + ad_field_length + 1;
+  }
+  return 0;
+}
+
+// Find the index of a given connection in the connection_properties array
+static uint8_t find_index_by_connection_handle(uint8_t connection)
+{
+  for (uint8_t i = 0; i < active_connections_num; i++) {
+    if (conn_properties[i].connection_handle == connection) {
+      return i;
+    }
+  }
+  return TABLE_INDEX_INVALID;
+}
+
+// Add a new connection to the connection_properties array
+static void add_connection(uint8_t connection, uint16_t address)
+{
+  conn_properties[active_connections_num].connection_handle = connection;
+  conn_properties[active_connections_num].server_address    = address;
+  active_connections_num++;
+}
+
+// Remove a connection from the connection_properties array
+// ...existing code...
+// Remove a connection from the connection_properties array
+static void remove_connection(uint8_t connection)
+{
+  uint8_t i;
+  uint8_t table_index = find_index_by_connection_handle(connection);
+
+  if (table_index == TABLE_INDEX_INVALID || active_connections_num == 0) {
+    return;
+  }
+
+  active_connections_num--;
+
+  // Shift entries after the removed connection toward 0 index
+  for (i = table_index; i < active_connections_num; i++) {
+    conn_properties[i] = conn_properties[i + 1];
+  }
+
+  // Clear the slot we've just removed so no junk values appear
+  conn_properties[active_connections_num].connection_handle = CONNECTION_HANDLE_INVALID;
+  conn_properties[active_connections_num].rssi = SL_BT_CONNECTION_RSSI_UNAVAILABLE;
+  conn_properties[active_connections_num].power_control_active = TX_POWER_CONTROL_INACTIVE;
+  conn_properties[active_connections_num].tx_power = TX_POWER_INVALID;
+  conn_properties[active_connections_num].remote_tx_power = TX_POWER_INVALID;
+  conn_properties[active_connections_num].server_address = 0;
+
+  // Clear service handles
+  conn_properties[active_connections_num].service_handle.OTA_handle = SERVICE_HANDLE_INVALID;
+  conn_properties[active_connections_num].service_handle.Generic_access_handle = SERVICE_HANDLE_INVALID;
+  conn_properties[active_connections_num].service_handle.Device_information_handle = SERVICE_HANDLE_INVALID;
+  conn_properties[active_connections_num].service_handle.Heart_rate_handle = SERVICE_HANDLE_INVALID;
+  conn_properties[active_connections_num].service_handle.Health_thermometer_handle = SERVICE_HANDLE_INVALID;
+
+  // Clear characteristic handles
+  conn_properties[active_connections_num].characteristic_handle.OTA_control_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.OTA_data_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Device_name_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Appearance_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Manufacturer_name_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Model_number_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Hardware_revision_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Temperature_measurement_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Temperature_type_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Measurement_interval_handle = CHARACTERISTIC_HANDLE_INVALID;
+  conn_properties[active_connections_num].characteristic_handle.Intermediate_temperature_measurement_handle = CHARACTERISTIC_HANDLE_INVALID;
+
+  // Clear data
+  conn_properties[active_connections_num].data.temp = TEMP_INVALID;
+  conn_properties[active_connections_num].data.temp_type = TEMP_TYPE_INVALID;
+  conn_properties[active_connections_num].data.measurement_interval = MEASUREMENT_INTERVAL_INVALID;
+  conn_properties[active_connections_num].data.intermediate_temp = TEMP_INVALID;
+  conn_properties[active_connections_num].data.unit = UNIT_INVALID;
+}
+// ...existing code...
+
+// Translate a IEEE-11073 Temperature Value to a float Value
+static float translate_IEEE_11073_temperature_to_float(IEEE_11073_float const *IEEE_11073_value)
+{
+  int32_t mantissa = 0;
+  uint8_t mantissa_l;
+  uint8_t mantissa_m;
+  int8_t mantissa_h;
+  int8_t exponent;
+
+  // Wrong Argument: NULL pointer is passed
+  if ( !IEEE_11073_value ) {
+    return NAN;
+  }
+
+  // Caching Fields
+  mantissa_l = IEEE_11073_value->mantissa_l;
+  mantissa_m = IEEE_11073_value->mantissa_m;
+  mantissa_h = IEEE_11073_value->mantissa_h;
+  exponent =  IEEE_11073_value->exponent;
+
+  // IEEE-11073 Standard NaN Value Passed
+  if ((mantissa_l == 0xFF) && (mantissa_m == 0xFF) && (mantissa_h == 0x7F) && (exponent == 0x00)) {
+    return NAN;
+  }
+
+  // Converting a 24bit Signed Value to a 32bit Signed Value
+  mantissa |= mantissa_h;
+  mantissa <<= 8;
+  mantissa |= mantissa_m;
+  mantissa <<= 8;
+  mantissa |= mantissa_l;
+  mantissa <<= 8;
+  mantissa >>= 8;
+
+  return ((float)mantissa) * powf(10.0f, (float)exponent);
+}
+//filter by MAC address
+static uint8_t check_MAC_address(uint8_t *addr, uint8_t addr_type){
+    if(addr_type == 0x00){
+      if(memcmp(addr, MAC_test, 6) == 0)
+        {
+          return 1;
+        }
+      else
+        return 0;
+}
+    else
+      return 0;
+}
+/**************************************************************************//**
+ * @brief
+ *   Function to Read and Cache Bluetooth Address.
+ * @param address_type_out [out]
+ *   A pointer to the outgoing address_type. This pointer can be NULL.
+ * @return
+ *   Pointer to the cached Bluetooth Address
+ *****************************************************************************/
+static bd_addr *read_and_cache_bluetooth_address(uint8_t *address_type_out)
+{
+  static bd_addr address;
+  static uint8_t address_type;
+  static bool cached = false;
+
+  if (!cached) {
+    sl_status_t sc = sl_bt_gap_get_identity_address(&address, &address_type);
+    app_assert_status(sc);
+    cached = true;
+  }
+
+  if (address_type_out) {
+    *address_type_out = address_type;
+  }
+
+  return &address;
+}
+
+/**************************************************************************//**
+ * @brief
+ *   Function to Print Bluetooth Address.
+ * @return
+ *   None
+ *****************************************************************************/
+static void print_bluetooth_address(void)
+{
+  uint8_t address_type;
+  bd_addr *address = read_and_cache_bluetooth_address(&address_type);
+
+  app_log_info("Bluetooth %s address: %02X:%02X:%02X:%02X:%02X:%02X" APP_LOG_NL,
+               address_type ? "static random" : "public device",
+               address->addr[5],
+               address->addr[4],
+               address->addr[3],
+               address->addr[2],
+               address->addr[1],
+               address->addr[0]);
+}
+
+// Print parameters to STDOUT. CR used to display results.
+void print_values(void)
+{
+  static bool print_header = true;
+  static bool previous_print_tx_power = PRINT_TX_POWER_DEFAULT;
+  uint8_t i;
+
+  // If TX power print request changes - header should be updated.
+  if (previous_print_tx_power != print_tx_power) {
+    previous_print_tx_power = print_tx_power;
+    print_header = true;
+  }
+
+  // Print header
+  if (print_header) {
+    app_log_info("");
+    for (i = 0u; i < SL_BT_CONFIG_MAX_CONNECTIONS; i++) {
+      if (false == print_tx_power) {
+        app_log_append("ADDR   TEMP   RSSI |");
+      } else {
+        app_log_append("ADDR   TEMP   RSSI    TXPW |");
+      }
+    }
+    app_log_nl();
+    print_header = false;
+  }
+
+  app_log_info("");
+  // Print parameters
+  for (i = 0u; i < SL_BT_CONFIG_MAX_CONNECTIONS; i++) {
+    if (TEMP_INVALID != conn_properties[i].data.temp) {
+      app_log_append("%04x ", conn_properties[i].server_address);
+      app_log_append("%6.2f", (double)conn_properties[i].data.temp);
+      if (conn_properties[i].rssi != SL_BT_CONNECTION_RSSI_UNAVAILABLE) {
+        app_log_append("% 3d", conn_properties[i].rssi);
+      } else {
+        app_log_append("---");
+      }
+      app_log_append("dBm");
+      if (print_tx_power) {
+        app_log_append(" %4d", conn_properties[i].tx_power);
+        app_log_append("dBm");
+      }
+      app_log_append("|");
+    } else if (!print_tx_power) {
+      app_log_append("---- ------- ------|");
+    } else {
+      app_log_append("----  ------ ------  ------|");
+    }
+  }
+  app_log_append("\r");
+}
+
+#ifdef SL_CATALOG_CLI_PRESENT
+void hello(sl_cli_command_arg_t *arguments)
+{
+  (void) arguments;
+  print_bluetooth_address();
+}
+
+void toggle_print_tx_power(sl_cli_command_arg_t *arguments)
+{
+  (void) arguments;
+  print_tx_power = !print_tx_power;
+}
+
+
+#endif // SL_CATALOG_CLI_PRESENT
