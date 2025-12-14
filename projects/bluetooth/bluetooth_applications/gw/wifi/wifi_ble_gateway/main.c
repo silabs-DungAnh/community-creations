@@ -8,7 +8,9 @@ int main(void)
 
   app_init();
 
-  while (sl_main_start_task_should_continue()) {
+  while (1) {
     app_process_action();
   }
 }
+
+// sl_main_start_task_should_continue()
