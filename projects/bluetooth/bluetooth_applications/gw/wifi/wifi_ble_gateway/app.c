@@ -4,6 +4,7 @@
 #include "decode.h"
 #include "decoder_test.h"
 #include "parser_test.h"
+#include "uart_driver_test.h"
 
 
 uart_fsm_decoder_t decoder;

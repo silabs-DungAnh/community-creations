@@ -66,6 +66,11 @@ osStatus_t uart_read_byte(uint8_t *data, uint32_t timeout_ms)
   osStatus_t status;
 
   status = osMessageQueueGet(rx_mq, data, NULL, timeout_ms);
+
+  if (status == osErrorResource) {
+    return status;
+  }
+
   if (status != osOK) {
     DEBUGOUT("uart_read_byte: %d\n", status);
     return status;

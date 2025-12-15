@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#define TLV_PARSER_TEST  1
+#define TLV_PARSER_TEST  0
 
 #ifdef __cplusplus
 extern "C" {
