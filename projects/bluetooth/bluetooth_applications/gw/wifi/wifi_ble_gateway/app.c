@@ -11,6 +11,7 @@ uart_fsm_decoder_t decoder;
 
 void app_init(void)
 {
+  DEBUGOUT ("====================== Initializations ======================\n");
   uart_init();
   fsm_decoder_init(&decoder);
 }
