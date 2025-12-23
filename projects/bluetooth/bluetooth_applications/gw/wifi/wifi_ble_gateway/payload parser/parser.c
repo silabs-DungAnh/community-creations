@@ -83,8 +83,11 @@ TLV_conv_error_t TLV_GetString  (const uint8_t* buf, uint32_t len, char* out){
         return TLV_CONV_ERR_NULL;
     }
 
+    // Copy bytes to output string 
     memcpy(out, buf, len);
-    out[len] = '\0'; // Null-terminate the string
+
+    // Null-termination: End of a string (C-style)
+    out[len] = '\0'; 
     return TLV_CONV_ERR_NONE;
 }
 

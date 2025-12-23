@@ -359,6 +359,76 @@ static void run_tlv_get_string_tests(void)
            (int)err, (int)TLV_CONV_ERR_NULL);
 }
 
+// ============= End-to-End Tests (Parse + Conversion) =============
+static void run_end_to_end_tests(void)
+{
+  TLV_token_t tokens[8];
+  uint32_t parsed = 0;
+  TLV_parsing_error_t parse_err;
+  TLV_conv_error_t conv_err;
+  
+  DEBUGOUT("\r\n[E2E TEST] Parse payload with mixed data types and convert values...\r\n");
+  
+  // Create payload with: UUID (type=0x02), Status (type=0x03), Config (type=0x06)
+  // UUID: 0x01A2B3C4 (4 bytes)
+  // Status: 0x42 (1 byte)
+  // Config: "ready" (5 bytes)
+  static const uint8_t e2e_payload[] = {
+    // Type 0x02 (UUID) - 4 bytes
+    0x00,0x02,  0x00,0x04,  0x01,0xA2,0xB3,0xC4,
+    // Type 0x03 (Status) - 1 byte
+    0x00,0x03,  0x00,0x01,  0x42,
+    // Type 0x06 (Config) - 5 bytes
+    0x00,0x06,  0x00,0x05,  'r','e','a','d','y'
+  };
+  
+  // Step 1: Parse the payload
+  memset(tokens, 0, sizeof(tokens));
+  parsed = 0;
+  parse_err = parse_tlv_payload(e2e_payload, sizeof(e2e_payload), tokens, 8, &parsed);
+  DEBUGOUT("[E2E] Parse result: err=%d parsed=%lu tokens\r\n", (int)parse_err, (unsigned long)parsed);
+  
+  if (parse_err == TLV_ERR_NONE && parsed >= 3) {
+    // Step 2: Extract and convert values from each token
+    for (uint32_t i = 0; i < parsed; i++) {
+      DEBUGOUT("[E2E] Token[%lu]: type=0x%04X len=%u\r\n", 
+               (unsigned long)i, tokens[i].type, (unsigned)tokens[i].length);
+      
+      switch(tokens[i].type) {
+        case TLV_TYPE_UUID:
+        {
+          uint32_t uuid_val = 0;
+          conv_err = TLV_GetUint32(tokens[i].value, &uuid_val);
+          DEBUGOUT("  -> UUID (converted): err=%d value=0x%08lX (expect 0x01A2B3C4)\r\n", 
+                   (int)conv_err, (unsigned long)uuid_val);
+          break;
+        }
+        case TLV_TYPE_STATUS:
+        {
+          uint8_t status_val = 0;
+          conv_err = TLV_GetUint8(tokens[i].value, &status_val);
+          DEBUGOUT("  -> STATUS (converted): err=%d value=0x%02X (expect 0x42)\r\n", 
+                   (int)conv_err, status_val);
+          break;
+        }
+        case TLV_TYPE_WIFI_CONFIG:
+        {
+          char config_str[32] = {0};
+          conv_err = TLV_GetString(tokens[i].value, tokens[i].length, config_str);
+          DEBUGOUT("  -> CONFIG (converted): err=%d value=\"%s\" (expect \"ready\")\r\n", 
+                   (int)conv_err, config_str);
+          break;
+        }
+        default:
+          DEBUGOUT("  -> Unknown type, skipping conversion\r\n");
+          break;
+      }
+    }
+  } else {
+    DEBUGOUT("[E2E TEST] FAILED: Parse error or insufficient tokens\r\n");
+  }
+}
+
 void parser_run_all_tests(void)
 {
   DEBUGOUT("\r\n========== TLV PARSER TESTS ==========\r\n");
@@ -371,4 +441,8 @@ void parser_run_all_tests(void)
   run_tlv_get_uint32_tests();
   run_tlv_get_string_tests();
   DEBUGOUT("[TLV CONVERSION TESTS] DONE\r\n");
+  
+  DEBUGOUT("\r\n========== END-TO-END TESTS ==========\r\n");
+  run_end_to_end_tests();
+  DEBUGOUT("[E2E TESTS] DONE\r\n");
 }
