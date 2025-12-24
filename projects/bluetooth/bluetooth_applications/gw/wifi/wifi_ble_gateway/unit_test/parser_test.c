@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 
-static void dump_tokens(const TLV_token_t* t, uint32_t n)
+static void dump_tokens(const tlv_token_t* t, uint32_t n)
 {
   for (uint32_t i = 0; i < n; i++) {
     DEBUGOUT("Token[%lu]: type=0x%04X len=%u val=",
@@ -18,7 +18,7 @@ static void dump_tokens(const TLV_token_t* t, uint32_t n)
 }
 
 
-static void dump_wifi_cred(const TLV_token_t* tok)
+static void dump_wifi_cred(const tlv_token_t* tok)
 {
   if (!tok || tok->length < 2) {
     DEBUGOUT("  [WIFI_CRED] invalid length\r\n");
@@ -59,9 +59,9 @@ static void dump_wifi_cred(const TLV_token_t* tok)
 
 static void run_tlv_parser_tests(void)
 {
-  TLV_token_t tokens[8];
+  tlv_token_t tokens[8];
   uint32_t parsed = 0;
-  TLV_parsing_error_t err;
+  tlv_parsing_error_t err;
 
   // Case 1: OK 2 tokens
   static const uint8_t payload_ok[] = {
@@ -136,195 +136,195 @@ static void run_tlv_parser_tests(void)
 
 }
 
-// ============= TLV_GetUint8 Tests =============
+// ============= tlv_getUint8 Tests =============
 static void run_tlv_get_uint8_tests(void)
 {
   uint8_t result;
-  TLV_conv_error_t err;
+  tlv_parsing_error_t err;
   
-  DEBUGOUT("\r\n[TLV_GetUint8 TEST] Starting...\r\n");
+  DEBUGOUT("\r\n[tlv_getUint8 TEST] Starting...\r\n");
   
   // Test 1: Valid single byte
   static const uint8_t test_data_1[] = {0x42};
   result = 0xFF;
-  err = TLV_GetUint8(test_data_1, &result);
-  DEBUGOUT("[TLV_GetUint8] TEST 1 - Valid byte: err=%d result=0x%02X (expect 0x42)\r\n", 
+  err = tlv_getUint8(test_data_1, &result);
+  DEBUGOUT("[tlv_getUint8] TEST 1 - Valid byte: err=%d result=0x%02X (expect 0x42)\r\n", 
            (int)err, result);
   
   // Test 2: Test with 0x00
   static const uint8_t test_data_2[] = {0x00};
   result = 0xFF;
-  err = TLV_GetUint8(test_data_2, &result);
-  DEBUGOUT("[TLV_GetUint8] TEST 2 - Zero byte: err=%d result=0x%02X (expect 0x00)\r\n", 
+  err = tlv_getUint8(test_data_2, &result);
+  DEBUGOUT("[tlv_getUint8] TEST 2 - Zero byte: err=%d result=0x%02X (expect 0x00)\r\n", 
            (int)err, result);
   
   // Test 3: Test with 0xFF
   static const uint8_t test_data_3[] = {0xFF};
   result = 0x00;
-  err = TLV_GetUint8(test_data_3, &result);
-  DEBUGOUT("[TLV_GetUint8] TEST 3 - Max byte: err=%d result=0x%02X (expect 0xFF)\r\n", 
+  err = tlv_getUint8(test_data_3, &result);
+  DEBUGOUT("[tlv_getUint8] TEST 3 - Max byte: err=%d result=0x%02X (expect 0xFF)\r\n", 
            (int)err, result);
   
   // Test 4: NULL buffer - should error
   result = 0xFF;
-  err = TLV_GetUint8(NULL, &result);
-  DEBUGOUT("[TLV_GetUint8] TEST 4 - NULL buffer: err=%d (expect %d)\r\n", 
+  err = tlv_getUint8(NULL, &result);
+  DEBUGOUT("[tlv_getUint8] TEST 4 - NULL buffer: err=%d (expect %d)\r\n", 
            (int)err, (int)TLV_CONV_ERR_NULL);
   
   // Test 5: NULL result pointer - should error
-  err = TLV_GetUint8(test_data_1, NULL);
-  DEBUGOUT("[TLV_GetUint8] TEST 5 - NULL result: err=%d (expect %d)\r\n", 
+  err = tlv_getUint8(test_data_1, NULL);
+  DEBUGOUT("[tlv_getUint8] TEST 5 - NULL result: err=%d (expect %d)\r\n", 
            (int)err, (int)TLV_CONV_ERR_NULL);
   
   // Test 6: Both NULL - should error
-  err = TLV_GetUint8(NULL, NULL);
-  DEBUGOUT("[TLV_GetUint8] TEST 6 - Both NULL: err=%d (expect %d)\r\n", 
+  err = tlv_getUint8(NULL, NULL);
+  DEBUGOUT("[tlv_getUint8] TEST 6 - Both NULL: err=%d (expect %d)\r\n", 
            (int)err, (int)TLV_CONV_ERR_NULL);
 }
 
-// ============= TLV_GetUint16 Tests =============
+// ============= tlv_getUint16 Tests =============
 static void run_tlv_get_uint16_tests(void)
 {
   uint16_t result;
-  TLV_conv_error_t err;
-  
-  DEBUGOUT("\r\n[TLV_GetUint16 TEST] Starting...\r\n");
-  
+  tlv_parsing_error_t err;
+
+  DEBUGOUT("\r\n[tlv_getUint16 TEST] Starting...\r\n");
+
   // Test 1: Valid 16-bit value (big-endian: 0x1234)
   static const uint8_t test_data_1[] = {0x12, 0x34};
   result = 0xFFFF;
-  err = TLV_GetUint16(test_data_1, &result);
-  DEBUGOUT("[TLV_GetUint16] TEST 1 - Valid value: err=%d result=0x%04X (expect 0x1234)\r\n", 
+  err = tlv_getUint16(test_data_1, &result);
+  DEBUGOUT("[tlv_getUint16] TEST 1 - Valid value: err=%d result=0x%04X (expect 0x1234)\r\n",
            (int)err, result);
-  
+
   // Test 2: Zero value
   static const uint8_t test_data_2[] = {0x00, 0x00};
   result = 0xFFFF;
-  err = TLV_GetUint16(test_data_2, &result);
-  DEBUGOUT("[TLV_GetUint16] TEST 2 - Zero value: err=%d result=0x%04X (expect 0x0000)\r\n", 
+  err = tlv_getUint16(test_data_2, &result);
+  DEBUGOUT("[tlv_getUint16] TEST 2 - Zero value: err=%d result=0x%04X (expect 0x0000)\r\n",
            (int)err, result);
-  
+
   // Test 3: Max value
   static const uint8_t test_data_3[] = {0xFF, 0xFF};
   result = 0x0000;
-  err = TLV_GetUint16(test_data_3, &result);
-  DEBUGOUT("[TLV_GetUint16] TEST 3 - Max value: err=%d result=0x%04X (expect 0xFFFF)\r\n", 
+  err = tlv_getUint16(test_data_3, &result);
+  DEBUGOUT("[tlv_getUint16] TEST 3 - Max value: err=%d result=0x%04X (expect 0xFFFF)\r\n",
            (int)err, result);
-  
+
   // Test 4: High byte only
   static const uint8_t test_data_4[] = {0xAB, 0x00};
   result = 0x0000;
-  err = TLV_GetUint16(test_data_4, &result);
-  DEBUGOUT("[TLV_GetUint16] TEST 4 - High byte: err=%d result=0x%04X (expect 0xAB00)\r\n", 
+  err = tlv_getUint16(test_data_4, &result);
+  DEBUGOUT("[tlv_getUint16] TEST 4 - High byte: err=%d result=0x%04X (expect 0xAB00)\r\n",
            (int)err, result);
-  
+
   // Test 5: NULL buffer
   result = 0xFFFF;
-  err = TLV_GetUint16(NULL, &result);
-  DEBUGOUT("[TLV_GetUint16] TEST 5 - NULL buffer: err=%d (expect %d)\r\n", 
+  err = tlv_getUint16(NULL, &result);
+  DEBUGOUT("[tlv_getUint16] TEST 5 - NULL buffer: err=%d (expect %d)\r\n",
            (int)err, (int)TLV_CONV_ERR_NULL);
-  
+
   // Test 6: NULL result pointer
-  err = TLV_GetUint16(test_data_1, NULL);
-  DEBUGOUT("[TLV_GetUint16] TEST 6 - NULL result: err=%d (expect %d)\r\n", 
+  err = tlv_getUint16(test_data_1, NULL);
+  DEBUGOUT("[tlv_getUint16] TEST 6 - NULL result: err=%d (expect %d)\r\n",
            (int)err, (int)TLV_CONV_ERR_NULL);
 }
 
-// ============= TLV_GetUint32 Tests =============
+// ============= tlv_getUint32 Tests =============
 static void run_tlv_get_uint32_tests(void)
 {
   uint32_t result;
-  TLV_conv_error_t err;
-  
-  DEBUGOUT("\r\n[TLV_GetUint32 TEST] Starting...\r\n");
-  
+  tlv_parsing_error_t err;
+
+  DEBUGOUT("\r\n[tlv_getUint32 TEST] Starting...\r\n");
+
   // Test 1: Valid 32-bit value (big-endian: 0x12345678)
   static const uint8_t test_data_1[] = {0x12, 0x34, 0x56, 0x78};
   result = 0xFFFFFFFF;
-  err = TLV_GetUint32(test_data_1, &result);
-  DEBUGOUT("[TLV_GetUint32] TEST 1 - Valid value: err=%d result=0x%08lX (expect 0x12345678)\r\n", 
+  err = tlv_getUint32(test_data_1, &result);
+  DEBUGOUT("[tlv_getUint32] TEST 1 - Valid value: err=%d result=0x%08lX (expect 0x12345678)\r\n",
            (int)err, (unsigned long)result);
-  
+
   // Test 2: Zero value
   static const uint8_t test_data_2[] = {0x00, 0x00, 0x00, 0x00};
   result = 0xFFFFFFFF;
-  err = TLV_GetUint32(test_data_2, &result);
-  DEBUGOUT("[TLV_GetUint32] TEST 2 - Zero value: err=%d result=0x%08lX (expect 0x00000000)\r\n", 
+  err = tlv_getUint32(test_data_2, &result);
+  DEBUGOUT("[tlv_getUint32] TEST 2 - Zero value: err=%d result=0x%08lX (expect 0x00000000)\r\n",
            (int)err, (unsigned long)result);
-  
+
   // Test 3: Max value
   static const uint8_t test_data_3[] = {0xFF, 0xFF, 0xFF, 0xFF};
   result = 0x00000000;
-  err = TLV_GetUint32(test_data_3, &result);
-  DEBUGOUT("[TLV_GetUint32] TEST 3 - Max value: err=%d result=0x%08lX (expect 0xFFFFFFFF)\r\n", 
+  err = tlv_getUint32(test_data_3, &result);
+  DEBUGOUT("[tlv_getUint32] TEST 3 - Max value: err=%d result=0x%08lX (expect 0xFFFFFFFF)\r\n",
            (int)err, (unsigned long)result);
-  
+
   // Test 4: Single byte in high position
   static const uint8_t test_data_4[] = {0xAB, 0x00, 0x00, 0x00};
   result = 0x00000000;
-  err = TLV_GetUint32(test_data_4, &result);
-  DEBUGOUT("[TLV_GetUint32] TEST 4 - High byte: err=%d result=0x%08lX (expect 0xAB000000)\r\n", 
+  err = tlv_getUint32(test_data_4, &result);
+  DEBUGOUT("[tlv_getUint32] TEST 4 - High byte: err=%d result=0x%08lX (expect 0xAB000000)\r\n",
            (int)err, (unsigned long)result);
-  
+
   // Test 5: Low 16-bits set
   static const uint8_t test_data_5[] = {0x00, 0x00, 0xCD, 0xEF};
   result = 0x00000000;
-  err = TLV_GetUint32(test_data_5, &result);
-  DEBUGOUT("[TLV_GetUint32] TEST 5 - Low 16-bits: err=%d result=0x%08lX (expect 0x0000CDEF)\r\n", 
+  err = tlv_getUint32(test_data_5, &result);
+  DEBUGOUT("[tlv_getUint32] TEST 5 - Low 16-bits: err=%d result=0x%08lX (expect 0x0000CDEF)\r\n",
            (int)err, (unsigned long)result);
-  
+
   // Test 6: NULL buffer
   result = 0xFFFFFFFF;
-  err = TLV_GetUint32(NULL, &result);
-  DEBUGOUT("[TLV_GetUint32] TEST 6 - NULL buffer: err=%d (expect %d)\r\n", 
+  err = tlv_getUint32(NULL, &result);
+  DEBUGOUT("[tlv_getUint32] TEST 6 - NULL buffer: err=%d (expect %d)\r\n",
            (int)err, (int)TLV_CONV_ERR_NULL);
-  
+
   // Test 7: NULL result pointer
-  err = TLV_GetUint32(test_data_1, NULL);
-  DEBUGOUT("[TLV_GetUint32] TEST 7 - NULL result: err=%d (expect %d)\r\n", 
+  err = tlv_getUint32(test_data_1, NULL);
+  DEBUGOUT("[tlv_getUint32] TEST 7 - NULL result: err=%d (expect %d)\r\n",
            (int)err, (int)TLV_CONV_ERR_NULL);
 }
 
-// ============= TLV_GetString Tests =============
+// ============= tlv_getString Tests =============
 static void run_tlv_get_string_tests(void)
 {
   char result[128];
-  TLV_conv_error_t err;
+  tlv_parsing_error_t err;
   
-  DEBUGOUT("\r\n[TLV_GetString TEST] Starting...\r\n");
+  DEBUGOUT("\r\n[tlv_getString TEST] Starting...\r\n");
   
   // Test 1: Valid string
   static const uint8_t test_data_1[] = {'H', 'e', 'l', 'l', 'o'};
   memset(result, 0, sizeof(result));
-  err = TLV_GetString(test_data_1, 5, result);
-  DEBUGOUT("[TLV_GetString] TEST 1 - Valid string: err=%d result=\"%s\" (expect \"Hello\")\r\n", 
+  err = tlv_getString(test_data_1, 5, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 1 - Valid string: err=%d result=\"%s\" (expect \"Hello\")\r\n", 
            (int)err, result);
   
   // Test 2: Single character
   static const uint8_t test_data_2[] = {'A'};
   memset(result, 0, sizeof(result));
-  err = TLV_GetString(test_data_2, 1, result);
-  DEBUGOUT("[TLV_GetString] TEST 2 - Single char: err=%d result=\"%s\" (expect \"A\")\r\n", 
+  err = tlv_getString(test_data_2, 1, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 2 - Single char: err=%d result=\"%s\" (expect \"A\")\r\n", 
            (int)err, result);
   
   // Test 3: String with spaces
   static const uint8_t test_data_3[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
   memset(result, 0, sizeof(result));
-  err = TLV_GetString(test_data_3, 11, result);
-  DEBUGOUT("[TLV_GetString] TEST 3 - String with spaces: err=%d result=\"%s\" (expect \"Hello World\")\r\n", 
+  err = tlv_getString(test_data_3, 11, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 3 - String with spaces: err=%d result=\"%s\" (expect \"Hello World\")\r\n", 
            (int)err, result);
   
   // Test 4: String with special characters
   static const uint8_t test_data_4[] = {'P', 'a', 's', 's', '@', '1', '2', '3'};
   memset(result, 0, sizeof(result));
-  err = TLV_GetString(test_data_4, 8, result);
-  DEBUGOUT("[TLV_GetString] TEST 4 - Special chars: err=%d result=\"%s\" (expect \"Pass@123\")\r\n", 
+  err = tlv_getString(test_data_4, 8, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 4 - Special chars: err=%d result=\"%s\" (expect \"Pass@123\")\r\n", 
            (int)err, result);
   
   // Test 5: Empty string (length 0)
   memset(result, 0xFF, sizeof(result));
-  err = TLV_GetString(test_data_1, 0, result);
-  DEBUGOUT("[TLV_GetString] TEST 5 - Empty string: err=%d result=\"%s\" (expect \"\")\r\n", 
+  err = tlv_getString(test_data_1, 0, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 5 - Empty string: err=%d result=\"%s\" (expect \"\")\r\n", 
            (int)err, result);
   
   // Test 6: Max length string (64 chars)
@@ -338,34 +338,34 @@ static void run_tlv_get_string_tests(void)
     '~',' ','@','\0'
   };
   memset(result, 0, sizeof(result));
-  err = TLV_GetString(test_data_6, 64, result);
-  DEBUGOUT("[TLV_GetString] TEST 6 - 64 char string: err=%d len=%lu (expect 64)\r\n", 
+  err = tlv_getString(test_data_6, 64, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 6 - 64 char string: err=%d len=%lu (expect 64)\r\n", 
            (int)err, (unsigned long)strlen(result));
   
   // Test 7: NULL buffer
   memset(result, 0, sizeof(result));
-  err = TLV_GetString(NULL, 5, result);
-  DEBUGOUT("[TLV_GetString] TEST 7 - NULL buffer: err=%d (expect %d)\r\n", 
+  err = tlv_getString(NULL, 5, result, sizeof(result));
+  DEBUGOUT("[tlv_getString] TEST 7 - NULL buffer: err=%d (expect %d)\r\n", 
            (int)err, (int)TLV_CONV_ERR_NULL);
   
   // Test 8: NULL result pointer
-  err = TLV_GetString(test_data_1, 5, NULL);
-  DEBUGOUT("[TLV_GetString] TEST 8 - NULL result: err=%d (expect %d)\r\n", 
+  err = tlv_getString(test_data_1, 5, NULL, 0);
+  DEBUGOUT("[tlv_getString] TEST 8 - NULL result: err=%d (expect %d)\r\n", 
            (int)err, (int)TLV_CONV_ERR_NULL);
   
   // Test 9: Both NULL
-  err = TLV_GetString(NULL, 5, NULL);
-  DEBUGOUT("[TLV_GetString] TEST 9 - Both NULL: err=%d (expect %d)\r\n", 
+  err = tlv_getString(NULL, 5, NULL, 0);
+  DEBUGOUT("[tlv_getString] TEST 9 - Both NULL: err=%d (expect %d)\r\n", 
            (int)err, (int)TLV_CONV_ERR_NULL);
 }
 
 // ============= End-to-End Tests (Parse + Conversion) =============
 static void run_end_to_end_tests(void)
 {
-  TLV_token_t tokens[8];
+  tlv_token_t tokens[8];
   uint32_t parsed = 0;
-  TLV_parsing_error_t parse_err;
-  TLV_conv_error_t conv_err;
+  tlv_parsing_error_t parse_err;
+  tlv_parsing_error_t conv_err;
   
   DEBUGOUT("\r\n[E2E TEST] Parse payload with mixed data types and convert values...\r\n");
   
@@ -398,7 +398,7 @@ static void run_end_to_end_tests(void)
         case TLV_TYPE_UUID:
         {
           uint32_t uuid_val = 0;
-          conv_err = TLV_GetUint32(tokens[i].value, &uuid_val);
+          conv_err = tlv_getUint32(tokens[i].value, &uuid_val);
           DEBUGOUT("  -> UUID (converted): err=%d value=0x%08lX (expect 0x01A2B3C4)\r\n", 
                    (int)conv_err, (unsigned long)uuid_val);
           break;
@@ -406,7 +406,7 @@ static void run_end_to_end_tests(void)
         case TLV_TYPE_STATUS:
         {
           uint8_t status_val = 0;
-          conv_err = TLV_GetUint8(tokens[i].value, &status_val);
+          conv_err = tlv_getUint8(tokens[i].value, &status_val);
           DEBUGOUT("  -> STATUS (converted): err=%d value=0x%02X (expect 0x42)\r\n", 
                    (int)conv_err, status_val);
           break;
@@ -414,7 +414,8 @@ static void run_end_to_end_tests(void)
         case TLV_TYPE_WIFI_CONFIG:
         {
           char config_str[32] = {0};
-          conv_err = TLV_GetString(tokens[i].value, tokens[i].length, config_str);
+          // Updated call with sizeof(config_str) as the 4th parameter
+          conv_err = tlv_getString(tokens[i].value, tokens[i].length, config_str, sizeof(config_str));
           DEBUGOUT("  -> CONFIG (converted): err=%d value=\"%s\" (expect \"ready\")\r\n", 
                    (int)conv_err, config_str);
           break;

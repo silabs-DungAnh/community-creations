@@ -112,6 +112,7 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
         }
 
         case READ_LENGTH: {
+            // Store 2 bytes of LENGTH
             if (decoder->packet_temp_buffer_index == 0) {
                 decoder->packet.length = (uint16_t)byte;
             } else if (decoder->packet_temp_buffer_index == 1) {
@@ -180,7 +181,8 @@ void decode_fsm (uart_fsm_decoder_t *decoder, uint8_t byte){
                     DECODE_LOG("Payload[%u]: 0x%02X\n", i, decoder->packet.payload[i]);
                 }
                 #endif
-
+                
+                // Print length of full payload received
                 DECODE_LOG("Full payload received (%u bytes)\n", decoder->packet.length);
                 
 

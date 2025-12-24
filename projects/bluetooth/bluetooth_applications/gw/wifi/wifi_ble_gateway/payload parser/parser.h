@@ -13,23 +13,24 @@ typedef enum {
     TLV_TYPE_UUID_VALUE  = 0x04,
     TLV_TYPE_OTA_VALUE   = 0x05,
     TLV_TYPE_WIFI_CONFIG = 0x06,
-} TLV_types_t;
+} tlv_types_t;
 
 
 /*
     TLV token structure
 */
 typedef struct {
-    TLV_types_t type;
+    tlv_types_t type;
     uint16_t    length;
     uint8_t*    value;
-} TLV_token_t;
+} tlv_token_t;
 
 
 /*
     Error codes for parsing process
 */
 typedef enum {
+    //======================= Parsing errror codes =======================
     TLV_ERR_UNKNOWN = -1,
     TLV_ERR_NONE,
     TLV_ERR_INVALID_LENGTH,
@@ -37,12 +38,8 @@ typedef enum {
     TLV_ERR_PARSING_FAILED,
     TLV_ERR_BUFFER_OVERFLOW,
     TLV_ERR_NULL,
-} TLV_parsing_error_t;
 
-/*
-    Error codes for data conversion functions
-*/
-typedef enum {
+    // ======================= Conversion error codes =======================
     TLV_CONV_ERR_NONE = 0,          // No error occurred during conversion
     TLV_CONV_ERR_INVALID_LENGTH,    // Value length does not match the expected size for this data type
     TLV_CONV_ERR_NULL,              // Null pointer passed as input or output buffer
@@ -52,23 +49,24 @@ typedef enum {
     TLV_CONV_ERR_ENCODING,          // String or text encoding error (e.g., invalid UTF-8 sequence)
     TLV_CONV_ERR_BUFFER_TOO_SMALL,  // Output buffer is too small to hold the converted result
     TLV_CONV_ERR_FORMAT,            // Value format is invalid or does not follow TLV specification
-} TLV_conv_error_t;
+} tlv_parsing_error_t;
+
 
 /*
     Function to parse TLV formatted payload
     @params:
         input_payload:              Pointer to the input payload buffer
         input_full_payload_length:  Length of the input payload buffer
-        output_parsed_tokens:       Pointer to an array of TLV_token_t to store parsed tokens
+        output_parsed_tokens:       Pointer to an array of tlv_token_t to store parsed tokens
         max_tokens_arr_capacity:    Maximum number of tokens that can be stored in the tokens array
         parsed_token_count:         Pointer to store the number of successfully parsed tokens
     @return:
         TLV_error_t indicating success or type of error encountered
 */
-TLV_parsing_error_t parse_tlv_payload(
+tlv_parsing_error_t parse_tlv_payload(
                             const uint8_t*  input_payload, 
                             uint32_t        input_full_payload_length,
-                            TLV_token_t*    output_parsed_tokens, 
+                            tlv_token_t*    output_parsed_tokens, 
                             uint32_t        max_tokens,
                             uint32_t*       parsed_token_count
                             );
@@ -82,9 +80,9 @@ TLV_parsing_error_t parse_tlv_payload(
     @return:
         TLV_conv_error_t indicating success or type of error encountered
 */
-TLV_conv_error_t TLV_GetUint8   (const uint8_t* buf, uint8_t* result);
-TLV_conv_error_t TLV_GetUint16  (const uint8_t* buf, uint16_t* result);
-TLV_conv_error_t TLV_GetUint32  (const uint8_t* buf, uint32_t* result);
+tlv_parsing_error_t tlv_getUint8   (const uint8_t* buf, uint8_t* result);
+tlv_parsing_error_t tlv_getUint16  (const uint8_t* buf, uint16_t* result);
+tlv_parsing_error_t tlv_getUint32  (const uint8_t* buf, uint32_t* result);
 
 /*
     Function to convert TLV value to string
@@ -93,9 +91,9 @@ TLV_conv_error_t TLV_GetUint32  (const uint8_t* buf, uint32_t* result);
         len:    Length of the TLV value
         out:    Pointer to the output string buffer
     @return:
-        TLV_conv_error_t indicating success or type of error encountered
+        tlv_parsing_error_t indicating success or type of error encountered
 */
-TLV_conv_error_t TLV_GetString  (const uint8_t* buf, uint32_t len, char* out);
+tlv_parsing_error_t tlv_getString  (const uint8_t* buf, uint32_t bbuf_len, char* out, uint32_t out_len);
 
 
 #endif /* PAYLOAD_PARSER_PARSER_H_ */

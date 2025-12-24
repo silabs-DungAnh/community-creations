@@ -2,11 +2,11 @@
 #include "stdint.h"
 #include "string.h"
 
-TLV_parsing_error_t parse_tlv_payload
+tlv_parsing_error_t parse_tlv_payload
                                     (
                                     const uint8_t*  input_payload,
                                     uint32_t        input_full_payload_length,
-                                    TLV_token_t*    output_parsed_tokens,
+                                    tlv_token_t*    output_parsed_tokens,
                                     uint32_t        max_tokens_arr_capacity,
                                     uint32_t*       parsed_token_count
                                     )
@@ -51,7 +51,7 @@ TLV_parsing_error_t parse_tlv_payload
     return TLV_ERR_NONE;
 }
 
-TLV_conv_error_t TLV_GetUint8   (const uint8_t* buf, uint8_t* result){
+tlv_parsing_error_t tlv_getUint8   (const uint8_t* buf, uint8_t* result){
     if (buf == NULL || result == NULL) {
         return TLV_CONV_ERR_NULL;
     }
@@ -60,7 +60,7 @@ TLV_conv_error_t TLV_GetUint8   (const uint8_t* buf, uint8_t* result){
     return TLV_CONV_ERR_NONE;
 }
 
-TLV_conv_error_t TLV_GetUint16  (const uint8_t* buf, uint16_t* result){
+tlv_parsing_error_t tlv_getUint16  (const uint8_t* buf, uint16_t* result){
     if (buf == NULL || result == NULL) {
         return TLV_CONV_ERR_NULL;
     }
@@ -69,7 +69,7 @@ TLV_conv_error_t TLV_GetUint16  (const uint8_t* buf, uint16_t* result){
     return TLV_CONV_ERR_NONE;
 }
 
-TLV_conv_error_t TLV_GetUint32  (const uint8_t* buf, uint32_t* result){
+tlv_parsing_error_t tlv_getUint32  (const uint8_t* buf, uint32_t* result){
     if (buf == NULL || result == NULL) {
         return TLV_CONV_ERR_NULL;
     }
@@ -78,16 +78,20 @@ TLV_conv_error_t TLV_GetUint32  (const uint8_t* buf, uint32_t* result){
     return TLV_CONV_ERR_NONE;
 }
 
-TLV_conv_error_t TLV_GetString  (const uint8_t* buf, uint32_t len, char* out){
+tlv_parsing_error_t tlv_getString  (const uint8_t* buf, uint32_t buf_len, char* out, uint32_t out_len){
     if (buf == NULL || out == NULL) {
         return TLV_CONV_ERR_NULL;
     }
 
+    if (buf_len + 1 > out_len) { // +1 for null-terminator
+        return TLV_CONV_ERR_BUFFER_TOO_SMALL;
+    }
+    
     // Copy bytes to output string 
-    memcpy(out, buf, len);
+    memcpy(out, buf, buf_len);
 
     // Null-termination: End of a string (C-style)
-    out[len] = '\0'; 
+    out[buf_len] = '\0'; 
     return TLV_CONV_ERR_NONE;
 }
 
