@@ -20,7 +20,7 @@ static uint8_t rx_chunk;
 // Queue
 static osMessageQueueId_t rx_mq = NULL; 
 static osMessageQueueId_t tx_mq = NULL;
-static volatile uint8_t tx_busy = 0;    //  Cờ để đánh dấu đang gửi
+static volatile uint8_t tx_busy = 0;    
 
 /* ======================= USART callback ================== */
 void usart_callback_event(uint32_t event)
@@ -44,6 +44,7 @@ void usart_callback_event(uint32_t event)
       break;
     }
 
+    // When 
     case SL_USART_EVENT_RECEIVE_COMPLETE: {
       osStatus_t status = osMessageQueuePut(rx_mq, (void *)&rx_chunk, 0U, 0U);
       if (status != osOK) {
@@ -61,11 +62,17 @@ void usart_callback_event(uint32_t event)
 }
 
 /* ======================= Driver ==================== */
+/* These functions will be called by the application */
 osStatus_t uart_read_byte(uint8_t *data, uint32_t timeout_ms)
 {
   osStatus_t status;
 
   status = osMessageQueueGet(rx_mq, data, NULL, timeout_ms);
+
+  if (status == osErrorResource) {
+    return status;
+  }
+
   if (status != osOK) {
     DEBUGOUT("uart_read_byte: %d\n", status);
     return status;
