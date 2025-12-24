@@ -1,5 +1,5 @@
 #include "parser_test.h"
-#include "payload parser/parser.h"
+#include "payload_parser/parser.h"
 #include "rsi_debug.h"
 #include <string.h>
 #include <stdint.h>
